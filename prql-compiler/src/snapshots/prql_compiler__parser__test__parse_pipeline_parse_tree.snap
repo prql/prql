@@ -878,15 +878,15 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                         },
                                                         inner: [
                                                             Pair {
-                                                                rule: pipeline,
+                                                                rule: nested_pipeline,
                                                                 span: Span {
-                                                                    str: "aggregate [                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
-                                                                    start: 414,
-                                                                    end: 660,
+                                                                    str: "(                     # For each group use a nested pipeline\n  aggregate [                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]\n)",
+                                                                    start: 351,
+                                                                    end: 662,
                                                                 },
                                                                 inner: [
                                                                     Pair {
-                                                                        rule: func_call,
+                                                                        rule: pipeline,
                                                                         span: Span {
                                                                             str: "aggregate [                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                             start: 414,
@@ -894,24 +894,24 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                         },
                                                                         inner: [
                                                                             Pair {
-                                                                                rule: ident,
+                                                                                rule: func_call,
                                                                                 span: Span {
-                                                                                    str: "aggregate",
+                                                                                    str: "aggregate [                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                     start: 414,
-                                                                                    end: 423,
-                                                                                },
-                                                                                inner: [],
-                                                                            },
-                                                                            Pair {
-                                                                                rule: expr,
-                                                                                span: Span {
-                                                                                    str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
-                                                                                    start: 424,
                                                                                     end: 660,
                                                                                 },
                                                                                 inner: [
                                                                                     Pair {
-                                                                                        rule: expr_coalesce,
+                                                                                        rule: ident,
+                                                                                        span: Span {
+                                                                                            str: "aggregate",
+                                                                                            start: 414,
+                                                                                            end: 423,
+                                                                                        },
+                                                                                        inner: [],
+                                                                                    },
+                                                                                    Pair {
+                                                                                        rule: expr,
                                                                                         span: Span {
                                                                                             str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                             start: 424,
@@ -919,7 +919,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                         },
                                                                                         inner: [
                                                                                             Pair {
-                                                                                                rule: expr_compare,
+                                                                                                rule: expr_coalesce,
                                                                                                 span: Span {
                                                                                                     str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                                     start: 424,
@@ -927,7 +927,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                 },
                                                                                                 inner: [
                                                                                                     Pair {
-                                                                                                        rule: expr_add,
+                                                                                                        rule: expr_compare,
                                                                                                         span: Span {
                                                                                                             str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                                             start: 424,
@@ -935,7 +935,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                         },
                                                                                                         inner: [
                                                                                                             Pair {
-                                                                                                                rule: expr_mul,
+                                                                                                                rule: expr_add,
                                                                                                                 span: Span {
                                                                                                                     str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                                                     start: 424,
@@ -943,7 +943,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                 },
                                                                                                                 inner: [
                                                                                                                     Pair {
-                                                                                                                        rule: list,
+                                                                                                                        rule: expr_mul,
                                                                                                                         span: Span {
                                                                                                                             str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
                                                                                                                             start: 424,
@@ -951,32 +951,32 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                         },
                                                                                                                         inner: [
                                                                                                                             Pair {
-                                                                                                                                rule: func_call,
+                                                                                                                                rule: list,
                                                                                                                                 span: Span {
-                                                                                                                                    str: "average salary",
-                                                                                                                                    start: 500,
-                                                                                                                                    end: 514,
+                                                                                                                                    str: "[                                # Aggregate each group to a single row\n    average salary,\n    average gross_salary,\n    sum salary,\n    sum gross_salary,\n    average gross_cost,\n    sum_gross_cost = sum gross_cost,\n    ct = count,\n  ]",
+                                                                                                                                    start: 424,
+                                                                                                                                    end: 660,
                                                                                                                                 },
                                                                                                                                 inner: [
                                                                                                                                     Pair {
-                                                                                                                                        rule: ident,
+                                                                                                                                        rule: func_call,
                                                                                                                                         span: Span {
-                                                                                                                                            str: "average",
+                                                                                                                                            str: "average salary",
                                                                                                                                             start: 500,
-                                                                                                                                            end: 507,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "salary",
-                                                                                                                                            start: 508,
                                                                                                                                             end: 514,
                                                                                                                                         },
                                                                                                                                         inner: [
                                                                                                                                             Pair {
-                                                                                                                                                rule: expr_coalesce,
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "average",
+                                                                                                                                                    start: 500,
+                                                                                                                                                    end: 507,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
                                                                                                                                                 span: Span {
                                                                                                                                                     str: "salary",
                                                                                                                                                     start: 508,
@@ -984,7 +984,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                 },
                                                                                                                                                 inner: [
                                                                                                                                                     Pair {
-                                                                                                                                                        rule: expr_compare,
+                                                                                                                                                        rule: expr_coalesce,
                                                                                                                                                         span: Span {
                                                                                                                                                             str: "salary",
                                                                                                                                                             start: 508,
@@ -992,7 +992,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                         },
                                                                                                                                                         inner: [
                                                                                                                                                             Pair {
-                                                                                                                                                                rule: expr_add,
+                                                                                                                                                                rule: expr_compare,
                                                                                                                                                                 span: Span {
                                                                                                                                                                     str: "salary",
                                                                                                                                                                     start: 508,
@@ -1000,7 +1000,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                                 },
                                                                                                                                                                 inner: [
                                                                                                                                                                     Pair {
-                                                                                                                                                                        rule: expr_mul,
+                                                                                                                                                                        rule: expr_add,
                                                                                                                                                                         span: Span {
                                                                                                                                                                             str: "salary",
                                                                                                                                                                             start: 508,
@@ -1008,418 +1008,19 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                                         },
                                                                                                                                                                         inner: [
                                                                                                                                                                             Pair {
-                                                                                                                                                                                rule: ident,
+                                                                                                                                                                                rule: expr_mul,
                                                                                                                                                                                 span: Span {
                                                                                                                                                                                     str: "salary",
                                                                                                                                                                                     start: 508,
                                                                                                                                                                                     end: 514,
                                                                                                                                                                                 },
-                                                                                                                                                                                inner: [],
-                                                                                                                                                                            },
-                                                                                                                                                                        ],
-                                                                                                                                                                    },
-                                                                                                                                                                ],
-                                                                                                                                                            },
-                                                                                                                                                        ],
-                                                                                                                                                    },
-                                                                                                                                                ],
-                                                                                                                                            },
-                                                                                                                                        ],
-                                                                                                                                    },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: func_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "average gross_salary",
-                                                                                                                                    start: 520,
-                                                                                                                                    end: 540,
-                                                                                                                                },
-                                                                                                                                inner: [
-                                                                                                                                    Pair {
-                                                                                                                                        rule: ident,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "average",
-                                                                                                                                            start: 520,
-                                                                                                                                            end: 527,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "gross_salary",
-                                                                                                                                            start: 528,
-                                                                                                                                            end: 540,
-                                                                                                                                        },
-                                                                                                                                        inner: [
-                                                                                                                                            Pair {
-                                                                                                                                                rule: expr_coalesce,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                    start: 528,
-                                                                                                                                                    end: 540,
-                                                                                                                                                },
-                                                                                                                                                inner: [
-                                                                                                                                                    Pair {
-                                                                                                                                                        rule: expr_compare,
-                                                                                                                                                        span: Span {
-                                                                                                                                                            str: "gross_salary",
-                                                                                                                                                            start: 528,
-                                                                                                                                                            end: 540,
-                                                                                                                                                        },
-                                                                                                                                                        inner: [
-                                                                                                                                                            Pair {
-                                                                                                                                                                rule: expr_add,
-                                                                                                                                                                span: Span {
-                                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                                    start: 528,
-                                                                                                                                                                    end: 540,
-                                                                                                                                                                },
-                                                                                                                                                                inner: [
-                                                                                                                                                                    Pair {
-                                                                                                                                                                        rule: expr_mul,
-                                                                                                                                                                        span: Span {
-                                                                                                                                                                            str: "gross_salary",
-                                                                                                                                                                            start: 528,
-                                                                                                                                                                            end: 540,
-                                                                                                                                                                        },
-                                                                                                                                                                        inner: [
-                                                                                                                                                                            Pair {
-                                                                                                                                                                                rule: ident,
-                                                                                                                                                                                span: Span {
-                                                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                                                    start: 528,
-                                                                                                                                                                                    end: 540,
-                                                                                                                                                                                },
-                                                                                                                                                                                inner: [],
-                                                                                                                                                                            },
-                                                                                                                                                                        ],
-                                                                                                                                                                    },
-                                                                                                                                                                ],
-                                                                                                                                                            },
-                                                                                                                                                        ],
-                                                                                                                                                    },
-                                                                                                                                                ],
-                                                                                                                                            },
-                                                                                                                                        ],
-                                                                                                                                    },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: func_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "sum salary",
-                                                                                                                                    start: 546,
-                                                                                                                                    end: 556,
-                                                                                                                                },
-                                                                                                                                inner: [
-                                                                                                                                    Pair {
-                                                                                                                                        rule: ident,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "sum",
-                                                                                                                                            start: 546,
-                                                                                                                                            end: 549,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "salary",
-                                                                                                                                            start: 550,
-                                                                                                                                            end: 556,
-                                                                                                                                        },
-                                                                                                                                        inner: [
-                                                                                                                                            Pair {
-                                                                                                                                                rule: expr_coalesce,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "salary",
-                                                                                                                                                    start: 550,
-                                                                                                                                                    end: 556,
-                                                                                                                                                },
-                                                                                                                                                inner: [
-                                                                                                                                                    Pair {
-                                                                                                                                                        rule: expr_compare,
-                                                                                                                                                        span: Span {
-                                                                                                                                                            str: "salary",
-                                                                                                                                                            start: 550,
-                                                                                                                                                            end: 556,
-                                                                                                                                                        },
-                                                                                                                                                        inner: [
-                                                                                                                                                            Pair {
-                                                                                                                                                                rule: expr_add,
-                                                                                                                                                                span: Span {
-                                                                                                                                                                    str: "salary",
-                                                                                                                                                                    start: 550,
-                                                                                                                                                                    end: 556,
-                                                                                                                                                                },
-                                                                                                                                                                inner: [
-                                                                                                                                                                    Pair {
-                                                                                                                                                                        rule: expr_mul,
-                                                                                                                                                                        span: Span {
-                                                                                                                                                                            str: "salary",
-                                                                                                                                                                            start: 550,
-                                                                                                                                                                            end: 556,
-                                                                                                                                                                        },
-                                                                                                                                                                        inner: [
-                                                                                                                                                                            Pair {
-                                                                                                                                                                                rule: ident,
-                                                                                                                                                                                span: Span {
-                                                                                                                                                                                    str: "salary",
-                                                                                                                                                                                    start: 550,
-                                                                                                                                                                                    end: 556,
-                                                                                                                                                                                },
-                                                                                                                                                                                inner: [],
-                                                                                                                                                                            },
-                                                                                                                                                                        ],
-                                                                                                                                                                    },
-                                                                                                                                                                ],
-                                                                                                                                                            },
-                                                                                                                                                        ],
-                                                                                                                                                    },
-                                                                                                                                                ],
-                                                                                                                                            },
-                                                                                                                                        ],
-                                                                                                                                    },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: func_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "sum gross_salary",
-                                                                                                                                    start: 562,
-                                                                                                                                    end: 578,
-                                                                                                                                },
-                                                                                                                                inner: [
-                                                                                                                                    Pair {
-                                                                                                                                        rule: ident,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "sum",
-                                                                                                                                            start: 562,
-                                                                                                                                            end: 565,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "gross_salary",
-                                                                                                                                            start: 566,
-                                                                                                                                            end: 578,
-                                                                                                                                        },
-                                                                                                                                        inner: [
-                                                                                                                                            Pair {
-                                                                                                                                                rule: expr_coalesce,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                    start: 566,
-                                                                                                                                                    end: 578,
-                                                                                                                                                },
-                                                                                                                                                inner: [
-                                                                                                                                                    Pair {
-                                                                                                                                                        rule: expr_compare,
-                                                                                                                                                        span: Span {
-                                                                                                                                                            str: "gross_salary",
-                                                                                                                                                            start: 566,
-                                                                                                                                                            end: 578,
-                                                                                                                                                        },
-                                                                                                                                                        inner: [
-                                                                                                                                                            Pair {
-                                                                                                                                                                rule: expr_add,
-                                                                                                                                                                span: Span {
-                                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                                    start: 566,
-                                                                                                                                                                    end: 578,
-                                                                                                                                                                },
-                                                                                                                                                                inner: [
-                                                                                                                                                                    Pair {
-                                                                                                                                                                        rule: expr_mul,
-                                                                                                                                                                        span: Span {
-                                                                                                                                                                            str: "gross_salary",
-                                                                                                                                                                            start: 566,
-                                                                                                                                                                            end: 578,
-                                                                                                                                                                        },
-                                                                                                                                                                        inner: [
-                                                                                                                                                                            Pair {
-                                                                                                                                                                                rule: ident,
-                                                                                                                                                                                span: Span {
-                                                                                                                                                                                    str: "gross_salary",
-                                                                                                                                                                                    start: 566,
-                                                                                                                                                                                    end: 578,
-                                                                                                                                                                                },
-                                                                                                                                                                                inner: [],
-                                                                                                                                                                            },
-                                                                                                                                                                        ],
-                                                                                                                                                                    },
-                                                                                                                                                                ],
-                                                                                                                                                            },
-                                                                                                                                                        ],
-                                                                                                                                                    },
-                                                                                                                                                ],
-                                                                                                                                            },
-                                                                                                                                        ],
-                                                                                                                                    },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: func_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "average gross_cost",
-                                                                                                                                    start: 584,
-                                                                                                                                    end: 602,
-                                                                                                                                },
-                                                                                                                                inner: [
-                                                                                                                                    Pair {
-                                                                                                                                        rule: ident,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "average",
-                                                                                                                                            start: 584,
-                                                                                                                                            end: 591,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "gross_cost",
-                                                                                                                                            start: 592,
-                                                                                                                                            end: 602,
-                                                                                                                                        },
-                                                                                                                                        inner: [
-                                                                                                                                            Pair {
-                                                                                                                                                rule: expr_coalesce,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                    start: 592,
-                                                                                                                                                    end: 602,
-                                                                                                                                                },
-                                                                                                                                                inner: [
-                                                                                                                                                    Pair {
-                                                                                                                                                        rule: expr_compare,
-                                                                                                                                                        span: Span {
-                                                                                                                                                            str: "gross_cost",
-                                                                                                                                                            start: 592,
-                                                                                                                                                            end: 602,
-                                                                                                                                                        },
-                                                                                                                                                        inner: [
-                                                                                                                                                            Pair {
-                                                                                                                                                                rule: expr_add,
-                                                                                                                                                                span: Span {
-                                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                                    start: 592,
-                                                                                                                                                                    end: 602,
-                                                                                                                                                                },
-                                                                                                                                                                inner: [
-                                                                                                                                                                    Pair {
-                                                                                                                                                                        rule: expr_mul,
-                                                                                                                                                                        span: Span {
-                                                                                                                                                                            str: "gross_cost",
-                                                                                                                                                                            start: 592,
-                                                                                                                                                                            end: 602,
-                                                                                                                                                                        },
-                                                                                                                                                                        inner: [
-                                                                                                                                                                            Pair {
-                                                                                                                                                                                rule: ident,
-                                                                                                                                                                                span: Span {
-                                                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                                                    start: 592,
-                                                                                                                                                                                    end: 602,
-                                                                                                                                                                                },
-                                                                                                                                                                                inner: [],
-                                                                                                                                                                            },
-                                                                                                                                                                        ],
-                                                                                                                                                                    },
-                                                                                                                                                                ],
-                                                                                                                                                            },
-                                                                                                                                                        ],
-                                                                                                                                                    },
-                                                                                                                                                ],
-                                                                                                                                            },
-                                                                                                                                        ],
-                                                                                                                                    },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: assign_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "sum_gross_cost = sum gross_cost",
-                                                                                                                                    start: 608,
-                                                                                                                                    end: 639,
-                                                                                                                                },
-                                                                                                                                inner: [
-                                                                                                                                    Pair {
-                                                                                                                                        rule: ident,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "sum_gross_cost",
-                                                                                                                                            start: 608,
-                                                                                                                                            end: 622,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: func_call,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "sum gross_cost",
-                                                                                                                                            start: 625,
-                                                                                                                                            end: 639,
-                                                                                                                                        },
-                                                                                                                                        inner: [
-                                                                                                                                            Pair {
-                                                                                                                                                rule: ident,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "sum",
-                                                                                                                                                    start: 625,
-                                                                                                                                                    end: 628,
-                                                                                                                                                },
-                                                                                                                                                inner: [],
-                                                                                                                                            },
-                                                                                                                                            Pair {
-                                                                                                                                                rule: expr,
-                                                                                                                                                span: Span {
-                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                    start: 629,
-                                                                                                                                                    end: 639,
-                                                                                                                                                },
-                                                                                                                                                inner: [
-                                                                                                                                                    Pair {
-                                                                                                                                                        rule: expr_coalesce,
-                                                                                                                                                        span: Span {
-                                                                                                                                                            str: "gross_cost",
-                                                                                                                                                            start: 629,
-                                                                                                                                                            end: 639,
-                                                                                                                                                        },
-                                                                                                                                                        inner: [
-                                                                                                                                                            Pair {
-                                                                                                                                                                rule: expr_compare,
-                                                                                                                                                                span: Span {
-                                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                                    start: 629,
-                                                                                                                                                                    end: 639,
-                                                                                                                                                                },
-                                                                                                                                                                inner: [
-                                                                                                                                                                    Pair {
-                                                                                                                                                                        rule: expr_add,
-                                                                                                                                                                        span: Span {
-                                                                                                                                                                            str: "gross_cost",
-                                                                                                                                                                            start: 629,
-                                                                                                                                                                            end: 639,
-                                                                                                                                                                        },
-                                                                                                                                                                        inner: [
-                                                                                                                                                                            Pair {
-                                                                                                                                                                                rule: expr_mul,
-                                                                                                                                                                                span: Span {
-                                                                                                                                                                                    str: "gross_cost",
-                                                                                                                                                                                    start: 629,
-                                                                                                                                                                                    end: 639,
-                                                                                                                                                                                },
                                                                                                                                                                                 inner: [
                                                                                                                                                                                     Pair {
                                                                                                                                                                                         rule: ident,
                                                                                                                                                                                         span: Span {
-                                                                                                                                                                                            str: "gross_cost",
-                                                                                                                                                                                            start: 629,
-                                                                                                                                                                                            end: 639,
+                                                                                                                                                                                            str: "salary",
+                                                                                                                                                                                            start: 508,
+                                                                                                                                                                                            end: 514,
                                                                                                                                                                                         },
                                                                                                                                                                                         inner: [],
                                                                                                                                                                                     },
@@ -1435,35 +1036,434 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                             },
                                                                                                                                         ],
                                                                                                                                     },
-                                                                                                                                ],
-                                                                                                                            },
-                                                                                                                            Pair {
-                                                                                                                                rule: assign_call,
-                                                                                                                                span: Span {
-                                                                                                                                    str: "ct = count",
-                                                                                                                                    start: 645,
-                                                                                                                                    end: 655,
-                                                                                                                                },
-                                                                                                                                inner: [
                                                                                                                                     Pair {
-                                                                                                                                        rule: ident,
+                                                                                                                                        rule: func_call,
                                                                                                                                         span: Span {
-                                                                                                                                            str: "ct",
-                                                                                                                                            start: 645,
-                                                                                                                                            end: 647,
+                                                                                                                                            str: "average gross_salary",
+                                                                                                                                            start: 520,
+                                                                                                                                            end: 540,
                                                                                                                                         },
-                                                                                                                                        inner: [],
+                                                                                                                                        inner: [
+                                                                                                                                            Pair {
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "average",
+                                                                                                                                                    start: 520,
+                                                                                                                                                    end: 527,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                    start: 528,
+                                                                                                                                                    end: 540,
+                                                                                                                                                },
+                                                                                                                                                inner: [
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: expr_coalesce,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                            start: 528,
+                                                                                                                                                            end: 540,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [
+                                                                                                                                                            Pair {
+                                                                                                                                                                rule: expr_compare,
+                                                                                                                                                                span: Span {
+                                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                                    start: 528,
+                                                                                                                                                                    end: 540,
+                                                                                                                                                                },
+                                                                                                                                                                inner: [
+                                                                                                                                                                    Pair {
+                                                                                                                                                                        rule: expr_add,
+                                                                                                                                                                        span: Span {
+                                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                                            start: 528,
+                                                                                                                                                                            end: 540,
+                                                                                                                                                                        },
+                                                                                                                                                                        inner: [
+                                                                                                                                                                            Pair {
+                                                                                                                                                                                rule: expr_mul,
+                                                                                                                                                                                span: Span {
+                                                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                                                    start: 528,
+                                                                                                                                                                                    end: 540,
+                                                                                                                                                                                },
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                                                            start: 528,
+                                                                                                                                                                                            end: 540,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
+                                                                                                                                                                            },
+                                                                                                                                                                        ],
+                                                                                                                                                                    },
+                                                                                                                                                                ],
+                                                                                                                                                            },
+                                                                                                                                                        ],
+                                                                                                                                                    },
+                                                                                                                                                ],
+                                                                                                                                            },
+                                                                                                                                        ],
                                                                                                                                     },
                                                                                                                                     Pair {
-                                                                                                                                        rule: expr,
+                                                                                                                                        rule: func_call,
                                                                                                                                         span: Span {
-                                                                                                                                            str: "count",
-                                                                                                                                            start: 650,
+                                                                                                                                            str: "sum salary",
+                                                                                                                                            start: 546,
+                                                                                                                                            end: 556,
+                                                                                                                                        },
+                                                                                                                                        inner: [
+                                                                                                                                            Pair {
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "sum",
+                                                                                                                                                    start: 546,
+                                                                                                                                                    end: 549,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "salary",
+                                                                                                                                                    start: 550,
+                                                                                                                                                    end: 556,
+                                                                                                                                                },
+                                                                                                                                                inner: [
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: expr_coalesce,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "salary",
+                                                                                                                                                            start: 550,
+                                                                                                                                                            end: 556,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [
+                                                                                                                                                            Pair {
+                                                                                                                                                                rule: expr_compare,
+                                                                                                                                                                span: Span {
+                                                                                                                                                                    str: "salary",
+                                                                                                                                                                    start: 550,
+                                                                                                                                                                    end: 556,
+                                                                                                                                                                },
+                                                                                                                                                                inner: [
+                                                                                                                                                                    Pair {
+                                                                                                                                                                        rule: expr_add,
+                                                                                                                                                                        span: Span {
+                                                                                                                                                                            str: "salary",
+                                                                                                                                                                            start: 550,
+                                                                                                                                                                            end: 556,
+                                                                                                                                                                        },
+                                                                                                                                                                        inner: [
+                                                                                                                                                                            Pair {
+                                                                                                                                                                                rule: expr_mul,
+                                                                                                                                                                                span: Span {
+                                                                                                                                                                                    str: "salary",
+                                                                                                                                                                                    start: 550,
+                                                                                                                                                                                    end: 556,
+                                                                                                                                                                                },
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "salary",
+                                                                                                                                                                                            start: 550,
+                                                                                                                                                                                            end: 556,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
+                                                                                                                                                                            },
+                                                                                                                                                                        ],
+                                                                                                                                                                    },
+                                                                                                                                                                ],
+                                                                                                                                                            },
+                                                                                                                                                        ],
+                                                                                                                                                    },
+                                                                                                                                                ],
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                    },
+                                                                                                                                    Pair {
+                                                                                                                                        rule: func_call,
+                                                                                                                                        span: Span {
+                                                                                                                                            str: "sum gross_salary",
+                                                                                                                                            start: 562,
+                                                                                                                                            end: 578,
+                                                                                                                                        },
+                                                                                                                                        inner: [
+                                                                                                                                            Pair {
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "sum",
+                                                                                                                                                    start: 562,
+                                                                                                                                                    end: 565,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                    start: 566,
+                                                                                                                                                    end: 578,
+                                                                                                                                                },
+                                                                                                                                                inner: [
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: expr_coalesce,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                            start: 566,
+                                                                                                                                                            end: 578,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [
+                                                                                                                                                            Pair {
+                                                                                                                                                                rule: expr_compare,
+                                                                                                                                                                span: Span {
+                                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                                    start: 566,
+                                                                                                                                                                    end: 578,
+                                                                                                                                                                },
+                                                                                                                                                                inner: [
+                                                                                                                                                                    Pair {
+                                                                                                                                                                        rule: expr_add,
+                                                                                                                                                                        span: Span {
+                                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                                            start: 566,
+                                                                                                                                                                            end: 578,
+                                                                                                                                                                        },
+                                                                                                                                                                        inner: [
+                                                                                                                                                                            Pair {
+                                                                                                                                                                                rule: expr_mul,
+                                                                                                                                                                                span: Span {
+                                                                                                                                                                                    str: "gross_salary",
+                                                                                                                                                                                    start: 566,
+                                                                                                                                                                                    end: 578,
+                                                                                                                                                                                },
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "gross_salary",
+                                                                                                                                                                                            start: 566,
+                                                                                                                                                                                            end: 578,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
+                                                                                                                                                                            },
+                                                                                                                                                                        ],
+                                                                                                                                                                    },
+                                                                                                                                                                ],
+                                                                                                                                                            },
+                                                                                                                                                        ],
+                                                                                                                                                    },
+                                                                                                                                                ],
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                    },
+                                                                                                                                    Pair {
+                                                                                                                                        rule: func_call,
+                                                                                                                                        span: Span {
+                                                                                                                                            str: "average gross_cost",
+                                                                                                                                            start: 584,
+                                                                                                                                            end: 602,
+                                                                                                                                        },
+                                                                                                                                        inner: [
+                                                                                                                                            Pair {
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "average",
+                                                                                                                                                    start: 584,
+                                                                                                                                                    end: 591,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                    start: 592,
+                                                                                                                                                    end: 602,
+                                                                                                                                                },
+                                                                                                                                                inner: [
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: expr_coalesce,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                            start: 592,
+                                                                                                                                                            end: 602,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [
+                                                                                                                                                            Pair {
+                                                                                                                                                                rule: expr_compare,
+                                                                                                                                                                span: Span {
+                                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                                    start: 592,
+                                                                                                                                                                    end: 602,
+                                                                                                                                                                },
+                                                                                                                                                                inner: [
+                                                                                                                                                                    Pair {
+                                                                                                                                                                        rule: expr_add,
+                                                                                                                                                                        span: Span {
+                                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                                            start: 592,
+                                                                                                                                                                            end: 602,
+                                                                                                                                                                        },
+                                                                                                                                                                        inner: [
+                                                                                                                                                                            Pair {
+                                                                                                                                                                                rule: expr_mul,
+                                                                                                                                                                                span: Span {
+                                                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                                                    start: 592,
+                                                                                                                                                                                    end: 602,
+                                                                                                                                                                                },
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                                                            start: 592,
+                                                                                                                                                                                            end: 602,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
+                                                                                                                                                                            },
+                                                                                                                                                                        ],
+                                                                                                                                                                    },
+                                                                                                                                                                ],
+                                                                                                                                                            },
+                                                                                                                                                        ],
+                                                                                                                                                    },
+                                                                                                                                                ],
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                    },
+                                                                                                                                    Pair {
+                                                                                                                                        rule: assign_call,
+                                                                                                                                        span: Span {
+                                                                                                                                            str: "sum_gross_cost = sum gross_cost",
+                                                                                                                                            start: 608,
+                                                                                                                                            end: 639,
+                                                                                                                                        },
+                                                                                                                                        inner: [
+                                                                                                                                            Pair {
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "sum_gross_cost",
+                                                                                                                                                    start: 608,
+                                                                                                                                                    end: 622,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: func_call,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "sum gross_cost",
+                                                                                                                                                    start: 625,
+                                                                                                                                                    end: 639,
+                                                                                                                                                },
+                                                                                                                                                inner: [
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: ident,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "sum",
+                                                                                                                                                            start: 625,
+                                                                                                                                                            end: 628,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [],
+                                                                                                                                                    },
+                                                                                                                                                    Pair {
+                                                                                                                                                        rule: expr,
+                                                                                                                                                        span: Span {
+                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                            start: 629,
+                                                                                                                                                            end: 639,
+                                                                                                                                                        },
+                                                                                                                                                        inner: [
+                                                                                                                                                            Pair {
+                                                                                                                                                                rule: expr_coalesce,
+                                                                                                                                                                span: Span {
+                                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                                    start: 629,
+                                                                                                                                                                    end: 639,
+                                                                                                                                                                },
+                                                                                                                                                                inner: [
+                                                                                                                                                                    Pair {
+                                                                                                                                                                        rule: expr_compare,
+                                                                                                                                                                        span: Span {
+                                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                                            start: 629,
+                                                                                                                                                                            end: 639,
+                                                                                                                                                                        },
+                                                                                                                                                                        inner: [
+                                                                                                                                                                            Pair {
+                                                                                                                                                                                rule: expr_add,
+                                                                                                                                                                                span: Span {
+                                                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                                                    start: 629,
+                                                                                                                                                                                    end: 639,
+                                                                                                                                                                                },
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: expr_mul,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "gross_cost",
+                                                                                                                                                                                            start: 629,
+                                                                                                                                                                                            end: 639,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [
+                                                                                                                                                                                            Pair {
+                                                                                                                                                                                                rule: ident,
+                                                                                                                                                                                                span: Span {
+                                                                                                                                                                                                    str: "gross_cost",
+                                                                                                                                                                                                    start: 629,
+                                                                                                                                                                                                    end: 639,
+                                                                                                                                                                                                },
+                                                                                                                                                                                                inner: [],
+                                                                                                                                                                                            },
+                                                                                                                                                                                        ],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
+                                                                                                                                                                            },
+                                                                                                                                                                        ],
+                                                                                                                                                                    },
+                                                                                                                                                                ],
+                                                                                                                                                            },
+                                                                                                                                                        ],
+                                                                                                                                                    },
+                                                                                                                                                ],
+                                                                                                                                            },
+                                                                                                                                        ],
+                                                                                                                                    },
+                                                                                                                                    Pair {
+                                                                                                                                        rule: assign_call,
+                                                                                                                                        span: Span {
+                                                                                                                                            str: "ct = count",
+                                                                                                                                            start: 645,
                                                                                                                                             end: 655,
                                                                                                                                         },
                                                                                                                                         inner: [
                                                                                                                                             Pair {
-                                                                                                                                                rule: expr_coalesce,
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "ct",
+                                                                                                                                                    start: 645,
+                                                                                                                                                    end: 647,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
                                                                                                                                                 span: Span {
                                                                                                                                                     str: "count",
                                                                                                                                                     start: 650,
@@ -1471,7 +1471,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                 },
                                                                                                                                                 inner: [
                                                                                                                                                     Pair {
-                                                                                                                                                        rule: expr_compare,
+                                                                                                                                                        rule: expr_coalesce,
                                                                                                                                                         span: Span {
                                                                                                                                                             str: "count",
                                                                                                                                                             start: 650,
@@ -1479,7 +1479,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                         },
                                                                                                                                                         inner: [
                                                                                                                                                             Pair {
-                                                                                                                                                                rule: expr_add,
+                                                                                                                                                                rule: expr_compare,
                                                                                                                                                                 span: Span {
                                                                                                                                                                     str: "count",
                                                                                                                                                                     start: 650,
@@ -1487,7 +1487,7 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                                 },
                                                                                                                                                                 inner: [
                                                                                                                                                                     Pair {
-                                                                                                                                                                        rule: expr_mul,
+                                                                                                                                                                        rule: expr_add,
                                                                                                                                                                         span: Span {
                                                                                                                                                                             str: "count",
                                                                                                                                                                             start: 650,
@@ -1495,13 +1495,23 @@ expression: "parse_tree_of_str(&include_str!(\"../../book/tests/prql/examples/va
                                                                                                                                                                         },
                                                                                                                                                                         inner: [
                                                                                                                                                                             Pair {
-                                                                                                                                                                                rule: ident,
+                                                                                                                                                                                rule: expr_mul,
                                                                                                                                                                                 span: Span {
                                                                                                                                                                                     str: "count",
                                                                                                                                                                                     start: 650,
                                                                                                                                                                                     end: 655,
                                                                                                                                                                                 },
-                                                                                                                                                                                inner: [],
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "count",
+                                                                                                                                                                                            start: 650,
+                                                                                                                                                                                            end: 655,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
                                                                                                                                                                             },
                                                                                                                                                                         ],
                                                                                                                                                                     },

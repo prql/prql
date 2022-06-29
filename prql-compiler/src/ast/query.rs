@@ -15,10 +15,23 @@ pub struct Query {
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct FuncDef {
     pub name: Ident,
-    pub positional_params: Vec<(Node, Option<Ty>)>, // ident
-    pub named_params: Vec<(Node, Option<Ty>)>,      // named expr
+    pub positional_params: Vec<FuncParam>, // ident
+    pub named_params: Vec<FuncParam>,      // named expr
     pub body: Box<Node>,
-    pub return_type: Option<Ty>,
+    pub return_ty: Option<Ty>,
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+pub struct FuncParam {
+    pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ty: Option<Ty>,
+
+    pub default_value: Option<Node>,
+
+    #[serde(skip)]
+    pub declared_at: Option<usize>,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]

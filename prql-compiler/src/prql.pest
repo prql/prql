@@ -19,7 +19,7 @@ func_def = { "func" ~ func_def_name ~ func_def_params ~ "->" ~ expr }
 
 func_def_name = { ident ~ type_def? }
 func_def_params = { func_def_param* }
-func_def_param = { (named_arg | ident) ~ type_def? }
+func_def_param = { ident ~ type_def? ~ (":" ~ expr)? }
 type_def = { "<" ~ type_term ~ ( "|" ~ type_term)* ~ ">" }
 type_term = { ident ~ type_def? }
 
@@ -81,7 +81,7 @@ term = _{ ( s_string | f_string | range | literal | ident | nested_pipeline | ex
 expr_unary = { ( operator_unary ~ ( nested_pipeline | ident )) }
 literal = _{ interval | number | boolean | null | string | timestamp | date | time }
 list = { "[" ~ (NEWLINE* ~ (assign_call | expr_call) ~ ("," ~ NEWLINE* ~ (assign_call | expr_call) )* ~ ","?)? ~ NEWLINE* ~ "]" }
-nested_pipeline = _{ "(" ~ (WHITESPACE | NEWLINE)* ~ pipeline ~ (WHITESPACE | NEWLINE)* ~ ")" }
+nested_pipeline = { "(" ~ (WHITESPACE | NEWLINE)* ~ pipeline? ~ (WHITESPACE | NEWLINE)* ~ ")" }
 
 // We haven't implemented escapes — I think we can mostly pass those through to
 // SQL, but there may be things we're missing.

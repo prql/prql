@@ -247,15 +247,15 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                         },
                                                         inner: [
                                                             Pair {
-                                                                rule: pipeline,
+                                                                rule: nested_pipeline,
                                                                 span: Span {
-                                                                    str: "aggregate [sum salary]",
-                                                                    start: 41,
-                                                                    end: 63,
+                                                                    str: "(\n                aggregate [sum salary]\n            )",
+                                                                    start: 23,
+                                                                    end: 77,
                                                                 },
                                                                 inner: [
                                                                     Pair {
-                                                                        rule: func_call,
+                                                                        rule: pipeline,
                                                                         span: Span {
                                                                             str: "aggregate [sum salary]",
                                                                             start: 41,
@@ -263,24 +263,24 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                         },
                                                                         inner: [
                                                                             Pair {
-                                                                                rule: ident,
+                                                                                rule: func_call,
                                                                                 span: Span {
-                                                                                    str: "aggregate",
+                                                                                    str: "aggregate [sum salary]",
                                                                                     start: 41,
-                                                                                    end: 50,
-                                                                                },
-                                                                                inner: [],
-                                                                            },
-                                                                            Pair {
-                                                                                rule: expr,
-                                                                                span: Span {
-                                                                                    str: "[sum salary]",
-                                                                                    start: 51,
                                                                                     end: 63,
                                                                                 },
                                                                                 inner: [
                                                                                     Pair {
-                                                                                        rule: expr_coalesce,
+                                                                                        rule: ident,
+                                                                                        span: Span {
+                                                                                            str: "aggregate",
+                                                                                            start: 41,
+                                                                                            end: 50,
+                                                                                        },
+                                                                                        inner: [],
+                                                                                    },
+                                                                                    Pair {
+                                                                                        rule: expr,
                                                                                         span: Span {
                                                                                             str: "[sum salary]",
                                                                                             start: 51,
@@ -288,7 +288,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                         },
                                                                                         inner: [
                                                                                             Pair {
-                                                                                                rule: expr_compare,
+                                                                                                rule: expr_coalesce,
                                                                                                 span: Span {
                                                                                                     str: "[sum salary]",
                                                                                                     start: 51,
@@ -296,7 +296,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                 },
                                                                                                 inner: [
                                                                                                     Pair {
-                                                                                                        rule: expr_add,
+                                                                                                        rule: expr_compare,
                                                                                                         span: Span {
                                                                                                             str: "[sum salary]",
                                                                                                             start: 51,
@@ -304,7 +304,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                         },
                                                                                                         inner: [
                                                                                                             Pair {
-                                                                                                                rule: expr_mul,
+                                                                                                                rule: expr_add,
                                                                                                                 span: Span {
                                                                                                                     str: "[sum salary]",
                                                                                                                     start: 51,
@@ -312,7 +312,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                 },
                                                                                                                 inner: [
                                                                                                                     Pair {
-                                                                                                                        rule: list,
+                                                                                                                        rule: expr_mul,
                                                                                                                         span: Span {
                                                                                                                             str: "[sum salary]",
                                                                                                                             start: 51,
@@ -320,32 +320,32 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                         },
                                                                                                                         inner: [
                                                                                                                             Pair {
-                                                                                                                                rule: func_call,
+                                                                                                                                rule: list,
                                                                                                                                 span: Span {
-                                                                                                                                    str: "sum salary",
-                                                                                                                                    start: 52,
-                                                                                                                                    end: 62,
+                                                                                                                                    str: "[sum salary]",
+                                                                                                                                    start: 51,
+                                                                                                                                    end: 63,
                                                                                                                                 },
                                                                                                                                 inner: [
                                                                                                                                     Pair {
-                                                                                                                                        rule: ident,
+                                                                                                                                        rule: func_call,
                                                                                                                                         span: Span {
-                                                                                                                                            str: "sum",
+                                                                                                                                            str: "sum salary",
                                                                                                                                             start: 52,
-                                                                                                                                            end: 55,
-                                                                                                                                        },
-                                                                                                                                        inner: [],
-                                                                                                                                    },
-                                                                                                                                    Pair {
-                                                                                                                                        rule: expr,
-                                                                                                                                        span: Span {
-                                                                                                                                            str: "salary",
-                                                                                                                                            start: 56,
                                                                                                                                             end: 62,
                                                                                                                                         },
                                                                                                                                         inner: [
                                                                                                                                             Pair {
-                                                                                                                                                rule: expr_coalesce,
+                                                                                                                                                rule: ident,
+                                                                                                                                                span: Span {
+                                                                                                                                                    str: "sum",
+                                                                                                                                                    start: 52,
+                                                                                                                                                    end: 55,
+                                                                                                                                                },
+                                                                                                                                                inner: [],
+                                                                                                                                            },
+                                                                                                                                            Pair {
+                                                                                                                                                rule: expr,
                                                                                                                                                 span: Span {
                                                                                                                                                     str: "salary",
                                                                                                                                                     start: 56,
@@ -353,7 +353,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                                                 },
                                                                                                                                                 inner: [
                                                                                                                                                     Pair {
-                                                                                                                                                        rule: expr_compare,
+                                                                                                                                                        rule: expr_coalesce,
                                                                                                                                                         span: Span {
                                                                                                                                                             str: "salary",
                                                                                                                                                             start: 56,
@@ -361,7 +361,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                                                         },
                                                                                                                                                         inner: [
                                                                                                                                                             Pair {
-                                                                                                                                                                rule: expr_add,
+                                                                                                                                                                rule: expr_compare,
                                                                                                                                                                 span: Span {
                                                                                                                                                                     str: "salary",
                                                                                                                                                                     start: 56,
@@ -369,7 +369,7 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                                                                 },
                                                                                                                                                                 inner: [
                                                                                                                                                                     Pair {
-                                                                                                                                                                        rule: expr_mul,
+                                                                                                                                                                        rule: expr_add,
                                                                                                                                                                         span: Span {
                                                                                                                                                                             str: "salary",
                                                                                                                                                                             start: 56,
@@ -377,13 +377,23 @@ expression: "parse_tree_of_str(\"group [title, country] (\n                aggre
                                                                                                                                                                         },
                                                                                                                                                                         inner: [
                                                                                                                                                                             Pair {
-                                                                                                                                                                                rule: ident,
+                                                                                                                                                                                rule: expr_mul,
                                                                                                                                                                                 span: Span {
                                                                                                                                                                                     str: "salary",
                                                                                                                                                                                     start: 56,
                                                                                                                                                                                     end: 62,
                                                                                                                                                                                 },
-                                                                                                                                                                                inner: [],
+                                                                                                                                                                                inner: [
+                                                                                                                                                                                    Pair {
+                                                                                                                                                                                        rule: ident,
+                                                                                                                                                                                        span: Span {
+                                                                                                                                                                                            str: "salary",
+                                                                                                                                                                                            start: 56,
+                                                                                                                                                                                            end: 62,
+                                                                                                                                                                                        },
+                                                                                                                                                                                        inner: [],
+                                                                                                                                                                                    },
+                                                                                                                                                                                ],
                                                                                                                                                                             },
                                                                                                                                                                         ],
                                                                                                                                                                     },

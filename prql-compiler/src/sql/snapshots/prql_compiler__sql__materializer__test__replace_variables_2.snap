@@ -7,6 +7,8 @@ expression: "&mat"
       name: employees
       alias: ~
       declared_at: 41
+  ty:
+    Literal: Table
 - Transform:
     Filter:
       Binary:
@@ -16,6 +18,16 @@ expression: "&mat"
         right:
           Literal:
             String: USA
+          ty:
+            Literal: String
+      ty: Infer
+  ty:
+    Function:
+      named: {}
+      args:
+        - Infer
+      return_ty:
+        Literal: Table
 - Transform:
     Filter:
       Binary:
@@ -28,13 +40,25 @@ expression: "&mat"
                 op: Add
                 right:
                   Ident: payroll_tax
+              ty: Infer
             op: Add
             right:
               Ident: benefits_cost
+          ty: Infer
         op: Gt
         right:
           Literal:
             Integer: 0
+          ty:
+            Literal: Integer
+      ty: Infer
+  ty:
+    Function:
+      named: {}
+      args:
+        - Infer
+      return_ty:
+        Literal: Table
 - Transform:
     Group:
       by:
@@ -51,11 +75,13 @@ expression: "&mat"
                         - Expr:
                             Ident: salary
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: SUM(
                         - Expr:
                             Ident: salary
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: AVG(
                         - Expr:
@@ -66,6 +92,7 @@ expression: "&mat"
                               right:
                                 Ident: payroll_tax
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: SUM(
                         - Expr:
@@ -76,6 +103,7 @@ expression: "&mat"
                               right:
                                 Ident: payroll_tax
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: AVG(
                         - Expr:
@@ -87,10 +115,12 @@ expression: "&mat"
                                   op: Add
                                   right:
                                     Ident: payroll_tax
+                                ty: Infer
                               op: Add
                               right:
                                 Ident: benefits_cost
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: SUM(
                         - Expr:
@@ -102,15 +132,32 @@ expression: "&mat"
                                   op: Add
                                   right:
                                     Ident: payroll_tax
+                                ty: Infer
                               op: Add
                               right:
                                 Ident: benefits_cost
                         - String: )
+                      ty: Infer
                     - SString:
                         - String: COUNT(*)
+                      ty: Infer
                   by:
                     - Ident: title
                     - Ident: country
+              ty:
+                Function:
+                  named: {}
+                  args:
+                    - Infer
+                  return_ty:
+                    Literal: Table
+  ty:
+    Function:
+      named: {}
+      args:
+        - Infer
+      return_ty:
+        Literal: Table
 - Transform:
     Filter:
       Binary:
@@ -126,14 +173,26 @@ expression: "&mat"
                       op: Add
                       right:
                         Ident: payroll_tax
+                    ty: Infer
                   op: Add
                   right:
                     Ident: benefits_cost
             - String: )
+          ty: Infer
         op: Gt
         right:
           Literal:
             Integer: 200
+          ty:
+            Literal: Integer
+      ty: Infer
+  ty:
+    Function:
+      named: {}
+      args:
+        - Infer
+      return_ty:
+        Literal: Table
 - Transform:
     Take:
       range:
@@ -143,4 +202,11 @@ expression: "&mat"
             Integer: 20
       by: []
       sort: []
+  ty:
+    Function:
+      named: {}
+      args:
+        - Infer
+      return_ty:
+        Literal: Table
 

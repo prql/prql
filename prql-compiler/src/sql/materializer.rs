@@ -205,32 +205,29 @@ impl Materializer {
 
     fn materialize_func_call(&mut self, func_call: &FuncCall, decl: Option<usize>) -> Result<Node> {
         // locate declaration
-        let func_dec = decl.ok_or_else(|| anyhow!("unresolved"))?;
-        let func_dec = &self.context.declarations.get(func_dec);
-        let func_dec = func_dec.as_function().unwrap().clone();
+        let func_def = self.context.declarations.get_func(decl)?.clone();
 
         // TODO: check if the function is called recursively.
 
         // for each of the params, replace its declared value
-        for (param, _) in func_dec.named_params {
+        for param in func_def.named_params {
             let id = param.declared_at.unwrap();
-            let param = param.item.into_named_arg()?;
 
-            let value = func_call
-                .named_args
-                .get(&param.name)
-                .map_or_else(|| param.expr.item.clone(), |expr| expr.item.clone());
+            let value = func_call.named_args.get(&param.name).map_or_else(
+                || param.default_value.unwrap().item,
+                |expr| expr.item.clone(),
+            );
 
             self.context.declarations.replace_expr(id, value.into());
         }
-        for ((param, _), arg) in zip(func_dec.positional_params.iter(), func_call.args.iter()) {
+        for (param, arg) in zip(func_def.positional_params.iter(), func_call.args.iter()) {
             let id = param.declared_at.unwrap();
             let expr = arg.item.clone().into();
             self.context.declarations.replace_expr(id, expr);
         }
 
         // Now fold body as normal node
-        self.fold_node(*func_dec.body)
+        self.fold_node(*func_def.body)
     }
 }
 
@@ -326,7 +323,7 @@ impl std::fmt::Debug for MaterializationContext {
 mod test {
 
     use super::*;
-    use crate::{parse, semantic::resolve_names, utils::diff};
+    use crate::{parse, analyze, utils::diff};
     use insta::{assert_display_snapshot, assert_snapshot, assert_yaml_snapshot};
     use serde_yaml::to_string;
 
@@ -335,7 +332,7 @@ mod test {
     }
 
     fn resolve_and_materialize(query: Query) -> Result<Vec<Node>> {
-        let (res, context) = resolve_names(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -354,7 +351,7 @@ mod test {
     "#,
         )?;
 
-        let (res, context) = resolve_names(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -367,14 +364,23 @@ mod test {
             &to_string(&mat)?
         ),
         @r###"
-        @@ -5,7 +5,3 @@
-                 name: employees
-                 alias: ~
+        @@ -7,16 +7,3 @@
                  declared_at: 36
+             ty:
+               Literal: Table
         -  - Transform:
         -      Derive:
         -        - Ident: gross_salary
+        -          ty: Infer
         -        - Ident: gross_cost
+        -          ty: Infer
+        -    ty:
+        -      Function:
+        -        named: {}
+        -        args:
+        -          - Infer
+        -        return_ty:
+        -          Literal: Table
         "###);
 
         Ok(())
@@ -436,8 +442,8 @@ take 20
         - FuncDef:
             name: count
             positional_params:
-              - - Ident: x
-                - ~
+              - name: x
+                default_value: ~
             named_params: []
             body:
               SString:
@@ -445,7 +451,7 @@ take 20
                 - Expr:
                     Ident: x
                 - String: )
-            return_type: ~
+            return_ty: ~
         - Pipeline:
             nodes:
               - FuncCall:
@@ -465,7 +471,7 @@ take 20
                   named_args: {}
         "###);
 
-        let (res, context) = resolve_names(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
@@ -476,7 +482,7 @@ take 20
         let diff = diff(&to_string(&pipeline.nodes)?, &to_string(&mat.nodes)?);
         assert!(!diff.is_empty());
         assert_display_snapshot!(diff, @r###"
-        @@ -7,5 +7,9 @@
+        @@ -9,7 +9,11 @@
          - Transform:
              Aggregate:
                assigns:
@@ -486,7 +492,9 @@ take 20
         +            - Expr:
         +                Ident: salary
         +            - String: )
+                   ty: Infer
                by: []
+           ty:
         "###);
 
         Ok(())
@@ -533,6 +541,8 @@ take 20
               name: a
               alias: ~
               declared_at: 41
+          ty:
+            Literal: Table
         "###);
 
         Ok(())
@@ -549,30 +559,33 @@ take 20
         "#,
         )?;
 
-        let (res, context) = resolve_names(query.nodes, None)?;
+        let (res, context) = analyze(query.nodes, None)?;
 
         let pipeline = find_pipeline(res);
 
         let (mat, _, _) = materialize(pipeline.clone(), context.into(), None)?;
 
         assert_snapshot!(diff(&to_string(&pipeline.nodes)?, &to_string(&mat.nodes)?), @r###"
-        @@ -7,6 +7,14 @@
+        @@ -9,9 +9,17 @@
          - Transform:
              Aggregate:
                assigns:
         -        - Ident: one
+        +        - SString:
+        +            - String: SUM(
+        +            - Expr:
+        +                Ident: foo
+        +            - String: )
+                   ty: Infer
         -        - Ident: two
         +        - SString:
         +            - String: SUM(
         +            - Expr:
         +                Ident: foo
         +            - String: )
-        +        - SString:
-        +            - String: SUM(
-        +            - Expr:
-        +                Ident: foo
-        +            - String: )
+                   ty: Infer
                by: []
+           ty:
         "###);
 
         // Test it'll run the `sum foo` function first.
@@ -595,6 +608,8 @@ take 20
               name: a
               alias: ~
               declared_at: 40
+          ty:
+            Literal: Table
         - Transform:
             Aggregate:
               assigns:
@@ -609,7 +624,17 @@ take 20
                     right:
                       Literal:
                         Integer: 1
+                      ty:
+                        Literal: Integer
+                  ty: Infer
               by: []
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         "###);
 
         Ok(())
@@ -637,6 +662,8 @@ take 20
               name: foo_table
               alias: ~
               declared_at: 39
+          ty:
+            Literal: Table
         "###);
 
         Ok(())
@@ -664,6 +691,8 @@ take 20
               name: employees
               alias: ~
               declared_at: 38
+          ty:
+            Literal: Table
         - Transform:
             Aggregate:
               assigns:
@@ -672,7 +701,15 @@ take 20
                     - Expr:
                         Ident: salary
                     - String: )
+                  ty: Infer
               by: []
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         "###
         );
         Ok(())
@@ -773,6 +810,8 @@ take 20
               name: employees
               alias: ~
               declared_at: 38
+          ty:
+            Literal: Table
         - Transform:
             Group:
               by:
@@ -789,9 +828,24 @@ take 20
                                 - Expr:
                                     Ident: salary
                                 - String: )
+                              ty: Infer
                           by:
                             - Ident: title
                             - Ident: emp_no
+                      ty:
+                        Function:
+                          named: {}
+                          args:
+                            - Infer
+                          return_ty:
+                            Literal: Table
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         - Transform:
             Group:
               by:
@@ -811,8 +865,23 @@ take 20
                                           Ident: salary
                                       - String: )
                                 - String: )
+                              ty: Infer
                           by:
                             - Ident: title
+                      ty:
+                        Function:
+                          named: {}
+                          args:
+                            - Infer
+                          return_ty:
+                            Literal: Table
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         "###);
 
         Ok(())
@@ -835,8 +904,8 @@ take 20
         "#,
         )?;
 
-        let (res1, context) = resolve_names(query1.nodes, None)?;
-        let (res2, context) = resolve_names(query2.nodes, Some(context))?;
+        let (res1, context) = analyze(query1.nodes, None)?;
+        let (res2, context) = analyze(query2.nodes, Some(context))?;
 
         let (mat, frame, context) = materialize(find_pipeline(res1), context.into(), None)?;
 
@@ -847,6 +916,8 @@ take 20
               name: orders
               alias: ~
               declared_at: 36
+          ty:
+            Literal: Table
         - Transform:
             Take:
               range:
@@ -856,6 +927,13 @@ take 20
                     Integer: 20
               by: []
               sort: []
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         "###);
         assert_yaml_snapshot!(frame.columns, @r###"
         ---
@@ -868,6 +946,7 @@ take 20
             op: Sub
             right:
               Ident: tax
+          ty: Infer
         "###);
 
         let (mat, frame, _) = materialize(find_pipeline(res2), context, None)?;
@@ -879,6 +958,8 @@ take 20
               name: table_1
               alias: ~
               declared_at: 41
+          ty:
+            Literal: Table
         - Transform:
             Join:
               side: Inner
@@ -889,6 +970,13 @@ take 20
               filter:
                 Using:
                   - Ident: customer_no
+          ty:
+            Function:
+              named: {}
+              args:
+                - Infer
+              return_ty:
+                Literal: Table
         "###);
         assert_yaml_snapshot!(frame.columns, @r###"
         ---

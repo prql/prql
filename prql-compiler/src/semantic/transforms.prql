@@ -1,12 +1,14 @@
 # Transform type definitions
 
-func from<table> with -> 0
-func select<table> assigns frame -> 0
-func filter<table> conditions frame -> 0
-func derive<table> assigns frame -> 0
-func aggregate<table> assigns frame -> 0
-func sort<table> by frame -> 0
-func take<table> expr frame -> 0
-func join<table> with filter side:inner frame -> 0
-func group<table> by pipeline frame -> 0
-func window<table> rows:0..0 range:0..0 expanding:false rolling:0 pipeline frame -> 0
+# make sure to update cast_transfrom if you change any of the declarations here
+
+func from<table> source<table|assigns<table>> -> ()
+func select<table> a<assigns<column>> tbl -> ()
+func filter<table> condition<bool> tbl -> ()
+func derive<table> a<assigns<column>> tbl -> ()
+func aggregate<table> a<assigns<column>> tbl -> ()
+func sort<table> by tbl -> ()
+func take<table> expr tbl -> ()
+func join<table> with<table|assigns<table>> filter side<unresolved>:inner tbl -> ()
+func group<table> by pipeline tbl -> ()
+func window<table> rows:0..0 range:0..0 expanding:false rolling:0 pipeline tbl -> ()

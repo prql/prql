@@ -122,7 +122,7 @@ impl Frame {
         Ok(())
     }
 
-    pub fn apply_assigns(&mut self, assigns: &[Node]) {
+    fn apply_assigns(&mut self, assigns: &[Node]) {
         for node in assigns {
             match &node.item {
                 Item::Ident(name) => {
@@ -134,7 +134,9 @@ impl Frame {
                         self.push_column(Some(name.clone()), id);
                     }
                 }
-                _ => unreachable!("assign must contain only idents after being resolved"),
+                item => unreachable!(
+                    "assign must contain only idents after being resolved, but got `{item}`",
+                ),
             }
         }
     }

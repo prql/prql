@@ -120,9 +120,8 @@ pub fn fold_item<T: ?Sized + AstFold>(fold: &mut T, item: Item) -> Result<Item> 
         Item::Table(table) => Item::Table(fold.fold_table(table)?),
         Item::Windowed(window) => Item::Windowed(fold.fold_windowed(window)?),
         Item::Type(t) => Item::Type(fold.fold_type(t)?),
-        // None of these capture variables, so we don't need to replace
-        // them.
-        Item::Literal(_) | Item::Interval(_) => item,
+        // None of these capture variables, so we don't need to fold them.
+        Item::Empty | Item::Literal(_) | Item::Interval(_) => item,
     })
 }
 
@@ -244,7 +243,7 @@ pub fn fold_func_call<T: ?Sized + AstFold>(fold: &mut T, func_call: FuncCall) ->
 
     Ok(FuncCall {
         // TODO: generalize? Or this never changes?
-        name: func_call.name.to_owned(),
+        name: func_call.name,
         args: func_call
             .args
             .into_iter()
@@ -269,20 +268,25 @@ pub fn fold_table_ref<T: ?Sized + AstFold>(fold: &mut T, table: TableRef) -> Res
 pub fn fold_func_def<T: ?Sized + AstFold>(fold: &mut T, func_def: FuncDef) -> Result<FuncDef> {
     Ok(FuncDef {
         name: fold.fold_ident(func_def.name)?,
-        positional_params: fold_typed_nodes(fold, func_def.positional_params)?,
-        named_params: fold_typed_nodes(fold, func_def.named_params)?,
+        positional_params: fold_func_param(fold, func_def.positional_params)?,
+        named_params: fold_func_param(fold, func_def.named_params)?,
         body: Box::new(fold.fold_node(*func_def.body)?),
-        return_type: func_def.return_type,
+        return_ty: func_def.return_ty,
     })
 }
 
-pub fn fold_typed_nodes<T: ?Sized + AstFold>(
+pub fn fold_func_param<T: ?Sized + AstFold>(
     fold: &mut T,
-    nodes: Vec<(Node, Option<Ty>)>,
-) -> Result<Vec<(Node, Option<Ty>)>> {
+    nodes: Vec<FuncParam>,
+) -> Result<Vec<FuncParam>> {
     nodes
         .into_iter()
-        .map(|(n, t)| Ok((fold.fold_node(n)?, t)))
+        .map(|param| {
+            Ok(FuncParam {
+                default_value: param.default_value.map(|n| fold.fold_node(n)).transpose()?,
+                ..param
+            })
+        })
         .try_collect()
 }
 

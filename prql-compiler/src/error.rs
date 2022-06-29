@@ -174,7 +174,7 @@ impl Reason {
                 expected,
                 found,
             } => {
-                let who = who.clone().map(|x| format!("`{x}` ")).unwrap_or_default();
+                let who = who.clone().map(|x| format!("{x} ")).unwrap_or_default();
                 format!("{who}expected {expected}, but found {found}")
             }
             Reason::Unexpected { found } => format!("unexpected {found}"),

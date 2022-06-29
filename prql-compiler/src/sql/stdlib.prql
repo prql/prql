@@ -15,7 +15,7 @@ func count_distinct <scalar|column> column ->  s"COUNT(DISTINCT `{column}`)"
 # TODO: Introduce a notation for getting start and end out of a ranges
 # could be range.0? or range.start? But to make this happen, we need to make
 # changes to how variables are resolved.
-func in<scalar> range value ->  s"{value} BETWEEN {range}"
+func in<bool> range value ->  s"{value} BETWEEN {range}"
 
 # Casting functions
 

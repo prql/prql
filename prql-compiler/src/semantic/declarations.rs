@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Context, Result};
 use enum_as_inner::EnumAsInner;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
@@ -28,14 +28,20 @@ impl Declarations {
         &self.0[id].0
     }
 
+    pub fn get_func(&self, id: Option<usize>) -> Result<&FuncDef> {
+        let id = id.context("unresolved function def?")?;
+        let (decl, _span) = &self.0[id];
+        decl.as_function().context("expected function definition?")
+    }
+
     pub fn push(&mut self, dec: Declaration, span: Option<Span>) -> usize {
         self.0.push((dec, span));
         self.0.len() - 1
     }
 
-    pub(crate) fn replace(&mut self, id: usize, new_decl: Declaration) {
-        let decl = self.0.get_mut(id).unwrap();
-        *decl = (new_decl, None);
+    pub(crate) fn replace(&mut self, id: usize, decl: Declaration) {
+        let reference = self.0.get_mut(id).unwrap();
+        *reference = (decl, None);
     }
 
     pub(crate) fn replace_expr(&mut self, id: usize, expr: Node) {
@@ -43,15 +49,19 @@ impl Declarations {
     }
 
     /// Takes a declaration with minimal memory copying. A dummy node is left in place.
-    #[allow(dead_code)]
-    pub(super) fn take_expr(&mut self, id: usize) -> Result<Box<Node>> {
+    pub(super) fn take(&mut self, id: usize) -> Declaration {
         let (decl, _) = self.0.get_mut(id).unwrap();
 
         let dummy = Node::from(Item::Literal(Literal::Null));
         let dummy = Declaration::Expression(Box::new(dummy));
-        let node = std::mem::replace(decl, dummy);
+        std::mem::replace(decl, dummy)
+    }
+}
 
-        node.into_expression().map_err(|e| anyhow!(e))
+impl From<Declaration> for anyhow::Error {
+    fn from(dec: Declaration) -> Self {
+        // panic!("Unexpected declaration type: {dec:?}");
+        anyhow::anyhow!("Unexpected declaration type: {dec:?}")
     }
 }
 

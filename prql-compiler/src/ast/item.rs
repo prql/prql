@@ -10,6 +10,7 @@ use super::*;
 
 #[derive(Debug, EnumAsInner, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Item {
+    Empty,
     Ident(Ident),
     Literal(Literal),
     Assign(NamedExpr),
@@ -85,11 +86,20 @@ pub struct ListItem(pub Node);
 ///
 /// Note that `named_args` cannot be determined during parsing, but only during resolving.
 /// Until then, they are stored in args as named expression.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
 pub struct FuncCall {
     pub name: Ident,
     pub args: Vec<Node>,
     pub named_args: HashMap<Ident, Box<Node>>,
+}
+
+impl FuncCall {
+    pub fn without_args(name: Ident) -> Self {
+        FuncCall {
+            name,
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -205,6 +215,9 @@ impl From<Item> for anyhow::Error {
 impl Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Item::Empty => {
+                f.write_str("()")?;
+            }
             Item::Ident(s) => {
                 f.write_str(s)?;
             }
@@ -253,10 +266,10 @@ impl Display for Item {
             Item::FuncDef(func_def) => {
                 write!(f, "func {}", func_def.name)?;
                 for arg in &func_def.positional_params {
-                    write!(f, " {}", arg.0.item)?;
+                    write!(f, " {}", arg.name)?;
                 }
                 for arg in &func_def.named_params {
-                    write!(f, " {}", arg.0.item)?;
+                    write!(f, " {}", arg.name)?;
                 }
                 write!(f, " = {}\n\n", func_def.body.item)?;
             }
@@ -316,11 +329,11 @@ impl Display for Item {
             }
             Item::Type(typ) => {
                 f.write_char('<')?;
-                display_type(f, typ)?;
+                write!(f, "{typ}")?;
                 f.write_char('>')?;
             }
             Item::Literal(literal) => {
-                write!(f, "{:?}", literal)?;
+                write!(f, "{:}", literal)?;
             }
         }
         Ok(())
@@ -341,26 +354,5 @@ fn display_interpolation(
         }
     }
     f.write_char('"')?;
-    Ok(())
-}
-
-fn display_type(f: &mut std::fmt::Formatter, typ: &Ty) -> Result<(), std::fmt::Error> {
-    match typ {
-        Ty::Literal(lit) => write!(f, "{:}", lit)?,
-        Ty::Named(name) => write!(f, "{:}", name)?,
-        Ty::Parameterized(t, param) => {
-            display_type(f, t)?;
-            write!(f, "<{:?}>", param.item)?
-        }
-        Ty::AnyOf(ts) => {
-            for (i, t) in ts.iter().enumerate() {
-                display_type(f, t)?;
-                if i < ts.len() - 1 {
-                    f.write_char('|')?;
-                }
-            }
-        }
-        Ty::Infer => {}
-    }
     Ok(())
 }

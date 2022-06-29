@@ -7,4 +7,6 @@ expression: mat
       name: prices
       alias: ~
       declared_at: 46
+  ty:
+    Literal: Table
 

@@ -34,8 +34,10 @@ pub struct Node {
     pub span: Option<Span>,
     #[serde(skip)]
     pub declared_at: Option<usize>,
-    #[serde(skip)]
-    pub ty: Ty,
+
+    /// Type of expression this node represents. [None] means type has not yet been determined.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ty: Option<Ty>,
 
     /// Is true when containing window functions
     #[serde(skip)]
@@ -109,7 +111,7 @@ impl From<Item> for Node {
             item,
             span: None,
             declared_at: None,
-            ty: Ty::Infer,
+            ty: None,
             is_complex: false,
         }
     }

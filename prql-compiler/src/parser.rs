@@ -46,12 +46,12 @@ fn parse_tree_of_str(source: &str, rule: Rule) -> Result<Pairs<Rule>> {
 /// Parses a parse tree of pest Pairs into an AST.
 fn ast_of_parse_pairs(pairs: Pairs<Rule>) -> Result<Vec<Node>> {
     pairs
+        .filter(|p| !matches!(p.as_rule(), Rule::EOI))
         .map(ast_of_parse_pair)
-        .filter_map(|n| n.transpose())
         .collect()
 }
 
-fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
+fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
     let span = pair.as_span();
     let rule = pair.as_rule();
 
@@ -105,14 +105,14 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         Rule::expr_mul | Rule::expr_add | Rule::expr_compare | Rule::expr => {
             let mut pairs = pair.into_inner();
 
-            let mut expr = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+            let mut expr = ast_of_parse_pair(pairs.next().unwrap())?;
             if let Some(op) = pairs.next() {
                 let op = BinOp::from_str(op.as_str())?;
 
                 expr = Node::from(Item::Binary {
                     op,
                     left: Box::new(expr),
-                    right: Box::new(ast_of_parse_pair(pairs.next().unwrap())?.unwrap()),
+                    right: Box::new(ast_of_parse_pair(pairs.next().unwrap())?),
                 });
             }
 
@@ -123,7 +123,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
 
             let op = pairs.next().unwrap();
 
-            let a = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+            let a = ast_of_parse_pair(pairs.next().unwrap())?;
             match UnOp::from_str(op.as_str()) {
                 Ok(op) => Item::Unary {
                     op,
@@ -170,8 +170,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
             let params = pairs.next().unwrap();
             let body = pairs.next().unwrap();
 
-            let (name, return_type) = parse_typed(name)?;
-            let name = name.item.into_ident()?;
+            let (name, return_type, _) = parse_typed(name)?;
 
             let params: Vec<_> = params
                 .into_inner()
@@ -179,34 +178,49 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
                 .map(parse_typed)
                 .try_collect()?;
 
-            let positional_params = params
-                .iter()
-                .filter(|x| matches!(x.0.item, Item::Ident(_)))
-                .cloned()
-                .collect();
-            let named_params = params
-                .iter()
-                .filter(|x| matches!(x.0.item, Item::NamedArg(_)))
-                .cloned()
-                .collect();
+            let mut positional_params = vec![];
+            let mut named_params = vec![];
+            for (name, ty, default_value) in params {
+                let param = FuncParam {
+                    name,
+                    ty,
+                    default_value,
+                    declared_at: None,
+                };
+                if param.default_value.is_some() {
+                    named_params.push(param)
+                } else {
+                    positional_params.push(param)
+                }
+            }
 
             Item::FuncDef(FuncDef {
                 name,
                 positional_params,
                 named_params,
-                body: Box::from(ast_of_parse_pair(body)?.unwrap()),
-                return_type,
+                body: Box::from(ast_of_parse_pair(body)?),
+                return_ty: return_type,
             })
         }
         Rule::func_call => {
-            let mut items = ast_of_parse_pairs(pair.into_inner())?;
+            let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
 
-            let name = items.remove(0).item.into_ident()?;
+            let name = nodes.remove(0).item.into_ident()?;
+
+            let mut named = HashMap::new();
+            let mut positional = Vec::new();
+            for node in nodes {
+                if let Item::NamedArg(ne) = node.item {
+                    named.insert(ne.name, ne.expr);
+                } else {
+                    positional.push(node);
+                }
+            }
 
             Item::FuncCall(FuncCall {
                 name,
-                args: items,
-                named_args: HashMap::new(),
+                args: positional,
+                named_args: named,
             })
         }
         Rule::table => {
@@ -245,9 +259,16 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         Rule::pipeline => {
             let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
             match nodes.len() {
-                0 => return Ok(None),
+                0 => unimplemented!(),
                 1 => nodes.remove(0).item,
                 _ => Item::Pipeline(Pipeline { nodes }),
+            }
+        }
+        Rule::nested_pipeline => {
+            if let Some(pipeline) = pair.into_inner().next() {
+                ast_of_parse_pair(pipeline)?.item
+            } else {
+                Item::Empty
             }
         }
         Rule::range => {
@@ -296,22 +317,19 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
                 .into_inner()
                 .into_iter()
                 .map(|pair| -> Result<Ty> {
-                    let mut parts: Vec<_> = pair.into_inner().into_iter().collect();
-                    let name = &parts.remove(0).as_str();
+                    let mut pairs = pair.into_inner();
+                    let name = pairs.next().unwrap().as_str();
                     let typ = match TyLit::from_str(name) {
                         Ok(t) => Ty::from(t),
+                        Err(_) if name == "unresolved" => Ty::Unresolved,
+                        Err(_) if name == "assigns" => Ty::Assigns,
                         Err(_) => {
                             eprintln!("named type: {}", name);
                             Ty::Named(name.to_string())
                         }
                     };
 
-                    let param = parts
-                        .pop()
-                        .map(|p| ast_of_parse_pairs(p.into_inner()))
-                        .transpose()?
-                        .map(|p| p.into_only())
-                        .transpose()?;
+                    let param = pairs.next().map(ast_of_parse_pair).transpose()?;
 
                     Ok(if let Some(param) = param {
                         Ty::Parameterized(Box::new(typ), Box::new(param))
@@ -330,8 +348,6 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
             Item::Type(typ)
         }
 
-        Rule::EOI => return Ok(None),
-
         _ => unreachable!("{pair}"),
     };
     let mut node = Node::from(item);
@@ -339,18 +355,28 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
         start: span.start(),
         end: span.end(),
     });
-    Ok(Some(node))
+    Ok(node)
 }
 
-fn parse_typed(pair: Pair<Rule>) -> Result<(Node, Option<Ty>)> {
+fn parse_typed(pair: Pair<Rule>) -> Result<(String, Option<Ty>, Option<Node>)> {
     let mut pairs = pair.into_inner();
 
-    let node = ast_of_parse_pair(pairs.next().unwrap())?.unwrap();
+    let name = pairs.next().unwrap().as_str().to_string();
 
-    let ty = pairs.next();
-    let ty = ty.map(ast_of_parse_pair).transpose()?.flatten();
-    let ty = ty.map(|t| t.item.into_type()).transpose()?;
-    Ok((node, ty))
+    let nodes: Vec<_> = pairs.map(ast_of_parse_pair).try_collect()?;
+
+    let mut ty = None;
+    let mut default = None;
+
+    for node in nodes {
+        if let Item::Type(t) = node.item {
+            ty = Some(t);
+        } else {
+            default = Some(node);
+        }
+    }
+
+    Ok((name, ty, default))
 }
 
 fn named_expr_of_nodes(items: &mut Vec<Node>) -> Result<NamedExpr, anyhow::Error> {
@@ -370,7 +396,7 @@ fn ast_of_interpolate_items(pair: Pair<Rule>) -> Result<Vec<InterpolateItem>> {
                 // Rule::interpolate_string_inner | Rule::jinja_string_inner => {
                 //     InterpolateItem::String(x.as_str().to_string())
                 // }
-                _ => InterpolateItem::Expr(Box::new(ast_of_parse_pair(x)?.unwrap())),
+                _ => InterpolateItem::Expr(Box::new(ast_of_parse_pair(x)?)),
             })
         })
         .collect::<Result<_>>()
@@ -1025,8 +1051,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1036,7 +1062,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func identity x ->  x", Rule::func_def
@@ -1046,12 +1072,12 @@ take 20
         FuncDef:
           name: identity
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Ident: x
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func plus_one x ->  (x + 1)", Rule::func_def
@@ -1061,8 +1087,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1072,7 +1098,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(
             "func plus_one x ->  x + 1", Rule::func_def
@@ -1082,8 +1108,8 @@ take 20
         FuncDef:
           name: plus_one
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             Binary:
@@ -1093,7 +1119,7 @@ take 20
               right:
                 Literal:
                   Integer: 1
-          return_type: ~
+          return_ty: ~
         "###);
         // An example to show that we can't delayer the tree, despite there
         // being lots of layers.
@@ -1105,8 +1131,8 @@ take 20
         FuncDef:
           name: foo
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params: []
           body:
             FuncCall:
@@ -1120,7 +1146,7 @@ take 20
                       Literal:
                         Integer: 1
               named_args: {}
-          return_type: ~
+          return_ty: ~
         "###);
 
         assert_yaml_snapshot!(ast_of_string("func return_constant ->  42", Rule::func_def)?, @r###"
@@ -1132,15 +1158,15 @@ take 20
           body:
             Literal:
               Integer: 42
-          return_type: ~
+          return_ty: ~
         "###);
         assert_yaml_snapshot!(ast_of_string(r#"func count X ->  s"SUM({X})""#, Rule::func_def)?, @r###"
         ---
         FuncDef:
           name: count
           positional_params:
-            - - Ident: X
-              - ~
+            - name: X
+              default_value: ~
           named_params: []
           body:
             SString:
@@ -1148,7 +1174,7 @@ take 20
               - Expr:
                   Ident: X
               - String: )
-          return_type: ~
+          return_ty: ~
         "###);
 
         /* TODO: Does not yet parse because `window` not yet implemented.
@@ -1173,14 +1199,12 @@ take 20
         FuncDef:
           name: add
           positional_params:
-            - - Ident: x
-              - ~
+            - name: x
+              default_value: ~
           named_params:
-            - - NamedArg:
-                  name: to
-                  expr:
-                    Ident: a
-              - ~
+            - name: to
+              default_value:
+                Ident: a
           body:
             Binary:
               left:
@@ -1188,7 +1212,7 @@ take 20
               op: Add
               right:
                 Ident: to
-          return_type: ~
+          return_ty: ~
         "###);
 
         Ok(())
@@ -1378,8 +1402,8 @@ take 20
             - FuncDef:
                 name: median
                 positional_params:
-                  - - Ident: x
-                    - ~
+                  - name: x
+                    default_value: ~
                 named_params: []
                 body:
                   Pipeline:
@@ -1391,7 +1415,7 @@ take 20
                             - Literal:
                                 Integer: 50
                           named_args: {}
-                return_type: ~
+                return_ty: ~
         "###);
     }
 

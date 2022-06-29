@@ -284,8 +284,8 @@ fn atomic_pipelines_of_pipeline(
     let mut counts: HashMap<&str, u32> = HashMap::new();
     let mut splits = vec![0];
     for (i, function) in pipeline.iter().enumerate() {
-        let transform =
-            (function.item.as_transform()).ok_or_else(|| anyhow!("expected Transform"))?;
+        let transform = (function.item.as_transform())
+            .ok_or_else(|| anyhow!("expected Transform, got `{}`", function.item))?;
 
         let split = match transform.as_ref() {
             "Join" => {
@@ -475,7 +475,7 @@ impl TryFrom<Item> for SelectItem {
                 alias: sql_ast::Ident::new(named.name),
                 expr: named.expr.item.try_into()?,
             },
-            _ => bail!("Can't convert to SelectItem; {:?}", item),
+            _ => bail!("Can't convert to SelectItem: `{:}`", item),
         })
     }
 }
@@ -629,7 +629,7 @@ impl TryFrom<Item> for Expr {
                     value,
                 },
             },
-            _ => bail!("Can't convert to Expr; {item:?}"),
+            _ => bail!("Can't convert to Expr: {item}"),
         })
     }
 }
@@ -751,7 +751,7 @@ impl TryFrom<Item> for sql_ast::Ident {
     fn try_from(item: Item) -> Result<Self> {
         Ok(match item {
             Item::Ident(ident) => sql_ast::Ident::new(ident),
-            _ => bail!("Can't convert to Ident; {item:?}"),
+            _ => bail!("Can't convert to Ident: {item:?}"),
         })
     }
 }
@@ -777,7 +777,7 @@ impl From<Vec<Node>> for AtomicTable {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{parser::parse, resolve_and_translate, resolve_names, sql::load_std_lib};
+    use crate::{parser::parse, analyze, resolve_and_translate, sql::load_std_lib};
     use insta::{
         assert_debug_snapshot, assert_display_snapshot, assert_snapshot, assert_yaml_snapshot,
     };
@@ -994,15 +994,15 @@ mod test {
 
     fn parse_and_resolve(prql: &str) -> Result<Pipeline> {
         let std_lib = load_std_lib()?;
-        let (_, context) = resolve_names(std_lib, None)?;
+        let (_, context) = analyze(std_lib, None)?;
 
-        let (mut nodes, _) = resolve_names(parse(prql)?.nodes, Some(context))?;
+        let (mut nodes, _) = analyze(parse(prql)?.nodes, Some(context))?;
         let pipeline = nodes.remove(nodes.len() - 1).coerce_to_pipeline();
         Ok(pipeline)
     }
 
     #[test]
-    fn test_ctes_of_pipeline() -> Result<()> {
+    fn test_ctes_of_pipeline() {
         let mut context = MaterializationContext::default();
 
         // One aggregate, take at the end
@@ -1014,8 +1014,8 @@ mod test {
         take 20
         "###;
 
-        let pipeline = parse_and_resolve(prql)?;
-        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context)?;
+        let pipeline = parse_and_resolve(prql).unwrap();
+        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context).unwrap();
         assert_eq!(queries.len(), 1);
 
         // One aggregate, but take at the top
@@ -1027,8 +1027,8 @@ mod test {
         sort sal
         "###;
 
-        let pipeline = parse_and_resolve(prql)?;
-        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context)?;
+        let pipeline = parse_and_resolve(prql).unwrap();
+        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context).unwrap();
         assert_eq!(queries.len(), 2);
 
         // A take, then two aggregates
@@ -1041,8 +1041,8 @@ mod test {
         sort sal
         "###;
 
-        let pipeline = parse_and_resolve(prql)?;
-        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context)?;
+        let pipeline = parse_and_resolve(prql).unwrap();
+        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context).unwrap();
         assert_eq!(queries.len(), 3);
 
         // A take, then a select
@@ -1052,10 +1052,9 @@ mod test {
         select first_name
         "###;
 
-        let pipeline = parse_and_resolve(prql)?;
-        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context)?;
+        let pipeline = parse_and_resolve(prql).unwrap();
+        let queries = atomic_pipelines_of_pipeline(pipeline, &mut context).unwrap();
         assert_eq!(queries.len(), 1);
-        Ok(())
     }
 
     #[test]
