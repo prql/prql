@@ -146,7 +146,7 @@ next transform.</p>
 <p>Because PRQL focuses on modularity, we have far fewer transforms than SQL, each
 one fulfilling a specific purpose. That’s often referred to as “orthogonality”.</p>
 <p>These are the currently available transforms:</p>
-<table><thead><tr><th>Transform</th><th>Purpose</th><th>SQL Equivalent</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Transform</th><th>Purpose</th><th>SQL Equivalent</th></tr></thead><tbody>
 <tr><td><a href="./transforms/from.html"><strong><code>from</code></strong></a></td><td>Starts from a table</td><td><code>FROM</code></td></tr>
 <tr><td><a href="./transforms/derive.html"><strong><code>derive</code></strong></a></td><td>Computes new columns</td><td><code>SELECT *, ... AS ...</code></td></tr>
 <tr><td><a href="./transforms/select.html"><strong><code>select</code></strong></a></td><td>Picks &amp; computes columns</td><td><code>SELECT ... AS ...</code></td></tr>
@@ -158,7 +158,7 @@ one fulfilling a specific purpose. That’s often referred to as “orthogonalit
 <tr><td><a href="./transforms/aggregate.html"><strong><code>aggregate</code></strong></a></td><td>Summarizes many rows into one row</td><td><code>SELECT foo(...)</code></td></tr>
 <tr><td><a href="./transforms/window.html"><strong><code>window</code></strong></a></td><td>Applies a pipeline to overlapping segments of rows</td><td><code>OVER</code>, <code>ROWS</code>, <code>RANGE</code></td></tr>
 </tbody></table>
-
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

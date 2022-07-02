@@ -143,7 +143,7 @@
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
 <p>A summary of PRQL syntax</p>
 <!-- The `|` characters need to be escaped, and surrounded with tags rather than backticks -->
-<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
 <tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
 <tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>from e = employees</code> <br> <code>derive total = (sum salary)</code></td></tr>
 <tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
@@ -157,6 +157,7 @@
 <tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
 <tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
 </tbody></table>
+</div>
 <h2 id="pipes"><a class="header" href="#pipes">Pipes</a></h2>
 <p>Pipes — the connection between <a href="../transforms.html">transforms</a> that make up a
 pipeline — can be either line breaks or a pipe character (<code>|</code>).</p>

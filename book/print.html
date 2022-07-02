@@ -499,7 +499,7 @@ from a
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
 <p>A summary of PRQL syntax</p>
 <!-- The `|` characters need to be escaped, and surrounded with tags rather than backticks -->
-<table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Syntax</th><th>Usage</th><th>Example</th></tr></thead><tbody>
 <tr><td><code>|</code></td><td>Pipe</td><td><code>from employees | select first_name</code></td></tr>
 <tr><td><code>=</code></td><td>Assigns &amp; Aliases</td><td><code>from e = employees</code> <br> <code>derive total = (sum salary)</code></td></tr>
 <tr><td><code>:</code></td><td>Named args &amp; Parameters</td><td><code>interp lower:0 1600 sat_score</code></td></tr>
@@ -513,6 +513,7 @@ from a
 <tr><td><code>??</code></td><td>Coalesce</td><td><code>amount ?? 0</code></td></tr>
 <tr><td><code>&lt;type&gt;</code></td><td>Annotations</td><td><code>@2021-01-01&lt;datetime&gt;</code></td></tr>
 </tbody></table>
+</div>
 <h2 id="pipes"><a class="header" href="#pipes">Pipes</a></h2>
 <p>Pipes — the connection between <a href="queries/../transforms.html">transforms</a> that make up a
 pipeline — can be either line breaks or a pipe character (<code>|</code>).</p>
@@ -776,7 +777,7 @@ next transform.</p>
 <p>Because PRQL focuses on modularity, we have far fewer transforms than SQL, each
 one fulfilling a specific purpose. That’s often referred to as “orthogonality”.</p>
 <p>These are the currently available transforms:</p>
-<table><thead><tr><th>Transform</th><th>Purpose</th><th>SQL Equivalent</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Transform</th><th>Purpose</th><th>SQL Equivalent</th></tr></thead><tbody>
 <tr><td><a href="./transforms/from.html"><strong><code>from</code></strong></a></td><td>Starts from a table</td><td><code>FROM</code></td></tr>
 <tr><td><a href="./transforms/derive.html"><strong><code>derive</code></strong></a></td><td>Computes new columns</td><td><code>SELECT *, ... AS ...</code></td></tr>
 <tr><td><a href="./transforms/select.html"><strong><code>select</code></strong></a></td><td>Picks &amp; computes columns</td><td><code>SELECT ... AS ...</code></td></tr>
@@ -788,7 +789,7 @@ one fulfilling a specific purpose. That’s often referred to as “orthogonalit
 <tr><td><a href="./transforms/aggregate.html"><strong><code>aggregate</code></strong></a></td><td>Summarizes many rows into one row</td><td><code>SELECT foo(...)</code></td></tr>
 <tr><td><a href="./transforms/window.html"><strong><code>window</code></strong></a></td><td>Applies a pipeline to overlapping segments of rows</td><td><code>OVER</code>, <code>ROWS</code>, <code>RANGE</code></td></tr>
 </tbody></table>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h1>
 <p>Summarizes many rows into one row.</p>
 <p>When applied:</p>
 <ul>
@@ -1370,7 +1371,7 @@ will include <code>n</code> last values, including current row. An average using
 window is also knows as a Simple Moving Average.</li>
 </ul>
 <p>Some examples:</p>
-<table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>rows:0..2</code></td><td>current row plus two following</td></tr>
 <tr><td><code>rows:-2..0</code></td><td>two preceding rows plus current row</td></tr>
 <tr><td><code>rolling:3</code></td><td>(same as previous)</td></tr>
@@ -1380,6 +1381,7 @@ window is also knows as a Simple Moving Average.</li>
 <tr><td><code>rows:0..</code></td><td>current row and all following rows until the end of the table</td></tr>
 <tr><td><code>rows:..</code></td><td>all rows, which same as not having window at all</td></tr>
 </tbody></table>
+</div>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <div class="comparison">
 <div>

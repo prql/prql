@@ -166,7 +166,7 @@ will include <code>n</code> last values, including current row. An average using
 window is also knows as a Simple Moving Average.</li>
 </ul>
 <p>Some examples:</p>
-<table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Expression</th><th>Meaning</th></tr></thead><tbody>
 <tr><td><code>rows:0..2</code></td><td>current row plus two following</td></tr>
 <tr><td><code>rows:-2..0</code></td><td>two preceding rows plus current row</td></tr>
 <tr><td><code>rolling:3</code></td><td>(same as previous)</td></tr>
@@ -176,6 +176,7 @@ window is also knows as a Simple Moving Average.</li>
 <tr><td><code>rows:0..</code></td><td>current row and all following rows until the end of the table</td></tr>
 <tr><td><code>rows:..</code></td><td>all rows, which same as not having window at all</td></tr>
 </tbody></table>
+</div>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
 <div class="comparison">
 <div>
