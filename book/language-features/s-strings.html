@@ -209,6 +209,29 @@ the quotes. <code>s&quot;average{col}&quot;</code> produces <code>average(salary
 <p>s-strings in user code are intended as an escape-hatch for an unimplemented
 feature. If we often need s-strings to express something, that’s a sign we
 should implement it in PRQL or PRQL’s stdlib.</p>
+<h2 id="backticks"><a class="header" href="#backticks">Backticks</a></h2>
+<p>PRQL will also pass through identifiers surrounded by backticks (including the
+backticks). Some databases — e.g. BigQuery — use this to allow identifiers which
+aren’t otherwise valid; such as those containing a hyphen.</p>
+<div class="comparison">
+<div>
+<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
+<pre><code class="language-prql">from `project-foo.dataset.table`
+join `project-bar`.`dataset`.`table` [col_bax]
+</code></pre>
+</div>
+<div>
+<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
+<pre><code class="language-sql">SELECT
+  `project-foo.dataset.table`.*,
+  `project-bar`.`dataset`.`table`.*,
+  col_bax
+FROM
+  `project-foo.dataset.table`
+  JOIN `project-bar`.`dataset`.`table` USING(col_bax)
+</code></pre>
+</div>
+</div>
 
                     </main>
 
