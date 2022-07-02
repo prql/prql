@@ -55,6 +55,9 @@ pub trait AstFold {
     fn fold_func_call(&mut self, func_call: FuncCall) -> Result<FuncCall> {
         fold_func_call(self, func_call)
     }
+    fn fold_func_curry(&mut self, func_curry: FuncCurry) -> Result<FuncCurry> {
+        fold_func_curry(self, func_curry)
+    }
     fn fold_table_ref(&mut self, table_ref: TableRef) -> Result<TableRef> {
         fold_table_ref(self, table_ref)
     }
@@ -117,6 +120,7 @@ pub fn fold_item<T: ?Sized + AstFold>(fold: &mut T, item: Item) -> Result<Item> 
         ),
         Item::FuncDef(func) => Item::FuncDef(fold.fold_func_def(func)?),
         Item::FuncCall(func_call) => Item::FuncCall(fold.fold_func_call(func_call)?),
+        Item::FuncCurry(func_curry) => Item::FuncCurry(fold.fold_func_curry(func_curry)?),
         Item::Table(table) => Item::Table(fold.fold_table(table)?),
         Item::Windowed(window) => Item::Windowed(fold.fold_windowed(window)?),
         Item::Type(t) => Item::Type(fold.fold_type(t)?),
@@ -253,6 +257,24 @@ pub fn fold_func_call<T: ?Sized + AstFold>(fold: &mut T, func_call: FuncCall) ->
             .named_args
             .into_iter()
             .map(|(name, expr)| fold.fold_node(*expr).map(|e| (name, Box::from(e))))
+            .try_collect()?,
+    })
+}
+pub fn fold_func_curry<T: ?Sized + AstFold>(
+    fold: &mut T,
+    func_curry: FuncCurry,
+) -> Result<FuncCurry> {
+    Ok(FuncCurry {
+        def_id: func_curry.def_id,
+        args: func_curry
+            .args
+            .into_iter()
+            .map(|item| fold.fold_node(item))
+            .try_collect()?,
+        named_args: func_curry
+            .named_args
+            .into_iter()
+            .map(|expr| expr.map(|e| fold.fold_node(e)).transpose())
             .try_collect()?,
     })
 }

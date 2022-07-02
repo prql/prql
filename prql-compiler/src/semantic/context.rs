@@ -1,9 +1,11 @@
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::fmt::Debug;
 
 use super::scope::NS_PARAM;
 use super::{Declaration, Declarations, Scope};
-use crate::ast::*;
+use crate::{ast::*, split_var_name};
 use crate::error::Span;
 
 /// Context of the pipeline.
@@ -54,6 +56,86 @@ impl Context {
         self.scope.add(format!("{NS_PARAM}.{name}"), id);
 
         id
+    }
+
+    pub fn lookup_name(&mut self, name: &str, span: Option<Span>) -> Result<usize, String> {
+        let (namespace, variable) = split_var_name(name);
+
+        if let Some(decls) = self.scope.variables.get(name) {
+            // lookup the inverse index
+
+            match decls.len() {
+                0 => unreachable!("inverse index contains empty lists?"),
+
+                // single match, great!
+                1 => Ok(decls.iter().next().cloned().unwrap()),
+
+                // ambiguous
+                _ => {
+                    let decls = decls
+                        .iter()
+                        .map(|d| self.declarations.get(*d))
+                        .map(|d| format!("`{d}`"))
+                        .join(", ");
+                    Err(format!(
+                        "Ambiguous reference. Could be from either of {decls}"
+                    ))
+                }
+            }
+        } else {
+            let all = if namespace.is_empty() {
+                "*".to_string()
+            } else {
+                format!("{namespace}.*")
+            };
+
+            if let Some(decls) = self.scope.variables.get(&all) {
+                // this variable can be from a namespace that we don't know all columns of
+
+                match decls.len() {
+                    0 => unreachable!("inverse index contains empty lists?"),
+
+                    // single match, great!
+                    1 => {
+                        let table_id = decls.iter().next().unwrap();
+
+                        let decl = Declaration::ExternRef {
+                            table: Some(*table_id),
+                            variable: variable.to_string(),
+                        };
+                        let id = self.declare(decl, span);
+                        self.scope.add(name.to_string(), id);
+
+                        Ok(id)
+                    }
+
+                    // don't report ambiguous variable, database may be able to resolve them
+                    _ => {
+                        let decl = Declaration::ExternRef {
+                            table: None,
+                            variable: name.to_string(),
+                        };
+                        let id = self.declare(decl, span);
+
+                        Ok(id)
+                    }
+                }
+            } else {
+                dbg!(&self);
+                Err(format!("Unknown name `{name}`"))
+            }
+        }
+    }
+
+    pub fn lookup_namespaces_of(&mut self, variable: &str) -> HashSet<usize> {
+        let mut r = HashSet::new();
+        if let Some(ns) = self.scope.variables.get(variable) {
+            r.extend(ns.clone());
+        }
+        if let Some(ns) = self.scope.variables.get("*") {
+            r.extend(ns.clone());
+        }
+        r
     }
 }
 

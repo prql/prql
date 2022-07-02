@@ -481,7 +481,7 @@ fn unpack<const P: usize, const N: usize>(
 
     // positional
     let positional =
-        (func_call.args.try_into()).map_err(|_| anyhow!("bad `{}` definition", func_call.name))?;
+        (func_call.args.try_into()).map_err(|_| anyhow!("bad `{}` definition", func_call.name.item))?;
 
     Ok((positional, named))
 }

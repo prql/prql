@@ -1,11 +1,9 @@
-use std::collections::HashSet;
-
 use anyhow::{bail, Result};
 use itertools::Itertools;
 
 use crate::ast::ast_fold::*;
 use crate::error::{Error, Reason, Span, WithErrorInfo};
-use crate::{ast::*, split_var_name, Declaration};
+use crate::{ast::*, Declaration};
 
 use super::Context;
 
@@ -78,36 +76,6 @@ impl AstFold for NameResolver {
             .try_collect()
     }
 
-    fn fold_node(&mut self, mut node: Node) -> Result<Node> {
-        let r = match node.item {
-            Item::FuncCall(ref func_call) => {
-                // find declaration
-                node.declared_at = self.resolve_name(&func_call.name, node.span)?;
-
-                self.fold_function_call(node)?
-            }
-
-            Item::Ident(ref ident) => {
-                node.declared_at = self.resolve_name(ident, node.span)?;
-
-                // convert ident to function without args
-                let func_decl = self.context.declarations.get_func(node.declared_at);
-                if func_decl.is_ok() {
-                    node.item = Item::FuncCall(FuncCall::without_args(ident.clone()));
-                    self.fold_function_call(node)?
-                } else {
-                    node
-                }
-            }
-
-            item => {
-                node.item = fold_item(self, item)?;
-                node
-            }
-        };
-
-        Ok(r)
-    }
 
     fn fold_join_filter(&mut self, filter: JoinFilter) -> Result<JoinFilter> {
         Ok(match filter {
@@ -117,7 +85,7 @@ impl AstFold for NameResolver {
                     let ident = node.item.as_ident().unwrap();
 
                     // ensure two namespaces
-                    let namespaces = self.lookup_namespaces_of(ident);
+                    let namespaces = self.context.lookup_namespaces_of(ident);
                     match namespaces.len() {
                         0 => Err(format!("Unknown variable `{ident}`")),
                         1 => Err("join using a column name must belong to both tables".to_string()),
@@ -153,38 +121,7 @@ impl AstFold for NameResolver {
 }
 
 impl NameResolver {
-    fn fold_function_call(&mut self, node: Node) -> Result<Node> {
-        let func_call = node.item.into_func_call().unwrap();
-
-        let id = node.declared_at;
-        let func_def = self.context.declarations.get_func(id)?.clone();
-
-        // fold params
-        let outer_namespace = self.namespace;
-        let mut folded = FuncCall::without_args(func_call.name);
-
-        for (index, arg) in func_call.args.into_iter().enumerate() {
-            let param = func_def.positional_params.get(index);
-
-            folded.args.push(self.fold_function_arg(arg, param)?);
-        }
-
-        for (name, arg) in func_call.named_args {
-            let param = func_def.named_params.iter().find(|p| p.name == name);
-
-            let arg = self.fold_function_arg(*arg, param)?;
-            folded.named_args.insert(name, Box::new(arg));
-        }
-
-        self.namespace = outer_namespace;
-        let func_call = Item::FuncCall(folded);
-
-        Ok(Node {
-            item: func_call,
-            ..node
-        })
-    }
-
+    
     fn fold_function_arg(&mut self, mut arg: Node, param: Option<&FuncParam>) -> Result<Node> {
         match param.and_then(|p| p.ty.as_ref()) {
             Some(Ty::Unresolved) => Ok(arg),
@@ -266,91 +203,11 @@ impl NameResolver {
                 // TODO: resolve tables
                 Ok(None)
             }
-            Namespace::FunctionsColumns => match self.lookup_name(name, span) {
+            Namespace::FunctionsColumns => match self.context.lookup_name(name, span) {
                 Ok(id) => Ok(Some(id)),
                 Err(e) => bail!(Error::new(Reason::Simple(e)).with_span(span)),
             },
         }
-    }
-
-    pub fn lookup_name(&mut self, name: &str, span: Option<Span>) -> Result<usize, String> {
-        let (namespace, variable) = split_var_name(name);
-
-        if let Some(decls) = self.context.scope.variables.get(name) {
-            // lookup the inverse index
-
-            match decls.len() {
-                0 => unreachable!("inverse index contains empty lists?"),
-
-                // single match, great!
-                1 => Ok(decls.iter().next().cloned().unwrap()),
-
-                // ambiguous
-                _ => {
-                    let decls = decls
-                        .iter()
-                        .map(|d| self.context.declarations.get(*d))
-                        .map(|d| format!("`{d}`"))
-                        .join(", ");
-                    Err(format!(
-                        "Ambiguous reference. Could be from either of {decls}"
-                    ))
-                }
-            }
-        } else {
-            let all = if namespace.is_empty() {
-                "*".to_string()
-            } else {
-                format!("{namespace}.*")
-            };
-
-            if let Some(decls) = self.context.scope.variables.get(&all) {
-                // this variable can be from a namespace that we don't know all columns of
-
-                match decls.len() {
-                    0 => unreachable!("inverse index contains empty lists?"),
-
-                    // single match, great!
-                    1 => {
-                        let table_id = decls.iter().next().unwrap();
-
-                        let decl = Declaration::ExternRef {
-                            table: Some(*table_id),
-                            variable: variable.to_string(),
-                        };
-                        let id = self.context.declare(decl, span);
-                        self.context.scope.add(name.to_string(), id);
-
-                        Ok(id)
-                    }
-
-                    // don't report ambiguous variable, database may be able to resolve them
-                    _ => {
-                        let decl = Declaration::ExternRef {
-                            table: None,
-                            variable: name.to_string(),
-                        };
-                        let id = self.context.declare(decl, span);
-
-                        Ok(id)
-                    }
-                }
-            } else {
-                dbg!(&self.context);
-                Err(format!("Unknown name `{name}`"))
-            }
-        }
-    }
-
-    pub fn lookup_namespaces_of(&mut self, variable: &str) -> HashSet<usize> {
-        let mut r = HashSet::new();
-        if let Some(ns) = self.context.scope.variables.get(variable) {
-            r.extend(ns.clone());
-        }
-        if let Some(ns) = self.context.scope.variables.get("*") {
-            r.extend(ns.clone());
-        }
-        r
     }
 }
 

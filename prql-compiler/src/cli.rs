@@ -108,10 +108,10 @@ fn compile_to(format: Format, source: &str) -> Result<Vec<u8>, Error> {
         }
         Format::PrqlReferences => {
             let std_lib = load_std_lib()?;
-            let (_, context) = semantic::analyze(std_lib, None)?;
+            let (_, context) = semantic::analyze_2(std_lib, None)?;
 
             let query = parse(source)?;
-            let (nodes, context) = semantic::analyze(query.nodes, Some(context))?;
+            let (nodes, context) = semantic::analyze_2(query.nodes, Some(context))?;
 
             semantic::label_references(&nodes, &context, "".to_string(), source.to_string());
 

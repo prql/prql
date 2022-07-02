@@ -145,7 +145,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
             } else {
                 let parsed = ast_of_parse_pairs(pairs)?;
                 Item::FuncCall(FuncCall {
-                    name: "coalesce".to_string(),
+                    name: Box::new(Item::Ident("coalesce".to_string()).into()),
                     args: vec![parsed[0].clone(), parsed[2].clone()],
                     named_args: HashMap::new(),
                 })
@@ -205,7 +205,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
         Rule::func_call => {
             let mut nodes = ast_of_parse_pairs(pair.into_inner())?;
 
-            let name = nodes.remove(0).item.into_ident()?;
+            let name = nodes.remove(0);
 
             let mut named = HashMap::new();
             let mut positional = Vec::new();
@@ -218,7 +218,7 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Node> {
             }
 
             Item::FuncCall(FuncCall {
-                name,
+                name: Box::new(name),
                 args: positional,
                 named_args: named,
             })
@@ -415,7 +415,8 @@ mod test {
         assert_yaml_snapshot!(ast_of_string(r#"take 10"#, Rule::expr_call)?, @r###"
         ---
         FuncCall:
-          name: take
+          name:
+            Ident: take
           args:
             - Literal:
                 Integer: 10
@@ -426,7 +427,8 @@ mod test {
         assert_yaml_snapshot!(ast_of_string(r#"take 1..10"#, Rule::expr_call)?, @r###"
         ---
         FuncCall:
-          name: take
+          name:
+            Ident: take
           args:
             - Range:
                 start:
@@ -644,15 +646,18 @@ Canada
             - Pipeline:
                 nodes:
                   - FuncCall:
-                      name: from
+                      name:
+                        Ident: from
                       args:
                         - Ident: "{{ ref('stg_orders') }}"
                       named_args: {}
                   - FuncCall:
-                      name: aggregate
+                      name:
+                        Ident: aggregate
                       args:
                         - FuncCall:
-                            name: sum
+                            name:
+                              Ident: sum
                             args:
                               - Ident: order_id
                             named_args: {}
@@ -687,7 +692,8 @@ Canada
               op: Add
               right:
                 FuncCall:
-                  name: f
+                  name:
+                    Ident: f
                   args:
                     - Literal:
                         Integer: 1
@@ -715,7 +721,8 @@ Canada
         ---
         List:
           - FuncCall:
-              name: a
+              name:
+                Ident: a
               args:
                 - Ident: b
               named_args: {}
@@ -787,7 +794,8 @@ Canada
           dialect: Generic
           nodes:
             - FuncCall:
-                name: filter
+                name:
+                  Ident: filter
                 args:
                   - Binary:
                       left:
@@ -807,12 +815,14 @@ Canada
           dialect: Generic
           nodes:
             - FuncCall:
-                name: filter
+                name:
+                  Ident: filter
                 args:
                   - Binary:
                       left:
                         FuncCall:
-                          name: upper
+                          name:
+                            Ident: upper
                           args:
                             - Ident: country
                           named_args: {}
@@ -838,16 +848,19 @@ Canada
             aggregate, @r###"
         ---
         FuncCall:
-          name: group
+          name:
+            Ident: group
           args:
             - List:
                 - Ident: title
             - FuncCall:
-                name: aggregate
+                name:
+                  Ident: aggregate
                 args:
                   - List:
                       - FuncCall:
-                          name: sum
+                          name:
+                            Ident: sum
                           args:
                             - Ident: salary
                           named_args: {}
@@ -866,16 +879,19 @@ Canada
             aggregate, @r###"
         ---
         FuncCall:
-          name: group
+          name:
+            Ident: group
           args:
             - List:
                 - Ident: title
             - FuncCall:
-                name: aggregate
+                name:
+                  Ident: aggregate
                 args:
                   - List:
                       - FuncCall:
-                          name: sum
+                          name:
+                            Ident: sum
                           args:
                             - Ident: salary
                           named_args: {}
@@ -891,7 +907,8 @@ Canada
         , @r###"
         ---
         FuncCall:
-          name: derive
+          name:
+            Ident: derive
           args:
             - List:
                 - Assign:
@@ -919,7 +936,8 @@ Canada
         , @r###"
         ---
         FuncCall:
-          name: select
+          name:
+            Ident: select
           args:
             - Ident: x
           named_args: {}
@@ -930,7 +948,8 @@ Canada
         , @r###"
         ---
         FuncCall:
-          name: select
+          name:
+            Ident: select
           args:
             - List:
                 - Ident: x
@@ -1136,7 +1155,8 @@ take 20
           named_params: []
           body:
             FuncCall:
-              name: foo
+              name:
+                Ident: foo
               args:
                 - Binary:
                     left:
@@ -1235,7 +1255,8 @@ take 20
         assert_yaml_snapshot!(
             func_call, @r###"
         ---
-        name: count
+        name:
+          Ident: count
         args:
           - SString:
               - String: "*"
@@ -1250,12 +1271,14 @@ take 20
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: mytable
                     named_args: {}
                 - FuncCall:
-                    name: select
+                    name:
+                      Ident: select
                     args:
                       - List:
                           - Binary:
@@ -1276,7 +1299,8 @@ take 20
                                     Binary:
                                       left:
                                         FuncCall:
-                                          name: d
+                                          name:
+                                            Ident: d
                                           args:
                                             - Ident: e
                                           named_args: {}
@@ -1291,7 +1315,8 @@ take 20
             ast, @r###"
         ---
         FuncCall:
-          name: add
+          name:
+            Ident: add
           args:
             - Ident: bar
             - Assign:
@@ -1314,7 +1339,8 @@ take 20
           name: newest_employees
           pipeline:
             FuncCall:
-              name: from
+              name:
+                Ident: from
               args:
                 - Ident: employees
               named_args: {}
@@ -1341,35 +1367,41 @@ take 20
             Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: employees
                     named_args: {}
                 - FuncCall:
-                    name: group
+                    name:
+                      Ident: group
                     args:
                       - Ident: country
                       - FuncCall:
-                          name: aggregate
+                          name:
+                            Ident: aggregate
                           args:
                             - List:
                                 - Assign:
                                     name: average_country_salary
                                     expr:
                                       FuncCall:
-                                        name: average
+                                        name:
+                                          Ident: average
                                         args:
                                           - Ident: salary
                                         named_args: {}
                           named_args: {}
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - Ident: tenure
                     named_args: {}
                 - FuncCall:
-                    name: take
+                    name:
+                      Ident: take
                     args:
                       - Literal:
                           Integer: 50
@@ -1387,7 +1419,8 @@ take 20
           nodes:
             - Ident: salary
             - FuncCall:
-                name: percentile
+                name:
+                  Ident: percentile
                 args:
                   - Literal:
                       Integer: 50
@@ -1410,7 +1443,8 @@ take 20
                     nodes:
                       - Ident: x
                       - FuncCall:
-                          name: percentile
+                          name:
+                            Ident: percentile
                           args:
                             - Literal:
                                 Integer: 50
@@ -1435,12 +1469,14 @@ take 20
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: mytable
                     named_args: {}
                 - FuncCall:
-                    name: filter
+                    name:
+                      Ident: filter
                     args:
                       - List:
                           - Binary:
@@ -1489,16 +1525,19 @@ aggregate [max c]
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: "`a.b`"
                     named_args: {}
                 - FuncCall:
-                    name: aggregate
+                    name:
+                      Ident: aggregate
                     args:
                       - List:
                           - FuncCall:
-                              name: max
+                              name:
+                                Ident: max
                               args:
                                 - Ident: c
                               named_args: {}
@@ -1525,17 +1564,20 @@ aggregate [max c]
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: invoices
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - Ident: issued_at
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - Unary:
                           op: Neg
@@ -1543,13 +1585,15 @@ aggregate [max c]
                             Ident: issued_at
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - List:
                           - Ident: issued_at
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - List:
                           - Unary:
@@ -1558,7 +1602,8 @@ aggregate [max c]
                                 Ident: issued_at
                     named_args: {}
                 - FuncCall:
-                    name: sort
+                    name:
+                      Ident: sort
                     args:
                       - List:
                           - Ident: issued_at
@@ -1592,18 +1637,21 @@ aggregate [max c]
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: employees
                     named_args: {}
                 - FuncCall:
-                    name: filter
+                    name:
+                      Ident: filter
                     args:
                       - Pipeline:
                           nodes:
                             - Ident: age
                             - FuncCall:
-                                name: between
+                                name:
+                                  Ident: between
                                 args:
                                   - Range:
                                       start:
@@ -1615,7 +1663,8 @@ aggregate [max c]
                                 named_args: {}
                     named_args: {}
                 - FuncCall:
-                    name: derive
+                    name:
+                      Ident: derive
                     args:
                       - List:
                           - Assign:
@@ -1667,12 +1716,14 @@ aggregate [max c]
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: employees
                     named_args: {}
                 - FuncCall:
-                    name: derive
+                    name:
+                      Ident: derive
                     args:
                       - List:
                           - Assign:
@@ -1702,7 +1753,8 @@ aggregate [max c]
         dialect: Generic
         nodes:
           - FuncCall:
-              name: derive
+              name:
+                Ident: derive
               args:
                 - List:
                     - Assign:
@@ -1738,7 +1790,8 @@ aggregate [max c]
         dialect: Generic
         nodes:
           - FuncCall:
-              name: derive
+              name:
+                Ident: derive
               args:
                 - Assign:
                     name: x
@@ -1760,7 +1813,8 @@ aggregate [max c]
         dialect: MsSql
         nodes:
           - FuncCall:
-              name: from
+              name:
+                Ident: from
               args:
                 - Ident: employees
               named_args: {}
@@ -1776,7 +1830,8 @@ aggregate [max c]
         dialect: BigQuery
         nodes:
           - FuncCall:
-              name: from
+              name:
+                Ident: from
               args:
                 - Ident: employees
               named_args: {}
@@ -1812,18 +1867,21 @@ aggregate [max c]
           - Pipeline:
               nodes:
                 - FuncCall:
-                    name: from
+                    name:
+                      Ident: from
                     args:
                       - Ident: employees
                     named_args: {}
                 - FuncCall:
-                    name: derive
+                    name:
+                      Ident: derive
                     args:
                       - Assign:
                           name: amount
                           expr:
                             FuncCall:
-                              name: coalesce
+                              name:
+                                Ident: coalesce
                               args:
                                 - Ident: amount
                                 - Literal:
@@ -1843,7 +1901,8 @@ aggregate [max c]
         dialect: Generic
         nodes:
           - FuncCall:
-              name: derive
+              name:
+                Ident: derive
               args:
                 - Assign:
                     name: x

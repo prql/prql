@@ -9,12 +9,14 @@ Query:
     - Pipeline:
         nodes:
           - FuncCall:
-              name: from
+              name:
+                Ident: from
               args:
                 - Ident: employees
               named_args: {}
           - FuncCall:
-              name: filter
+              name:
+                Ident: filter
               args:
                 - Binary:
                     left:
@@ -25,7 +27,8 @@ Query:
                         String: USA
               named_args: {}
           - FuncCall:
-              name: derive
+              name:
+                Ident: derive
               args:
                 - List:
                     - Assign:
@@ -48,7 +51,8 @@ Query:
                               Ident: benefits_cost
               named_args: {}
           - FuncCall:
-              name: filter
+              name:
+                Ident: filter
               args:
                 - Binary:
                     left:
@@ -59,37 +63,44 @@ Query:
                         Integer: 0
               named_args: {}
           - FuncCall:
-              name: group
+              name:
+                Ident: group
               args:
                 - List:
                     - Ident: title
                     - Ident: country
                 - FuncCall:
-                    name: aggregate
+                    name:
+                      Ident: aggregate
                     args:
                       - List:
                           - FuncCall:
-                              name: average
+                              name:
+                                Ident: average
                               args:
                                 - Ident: salary
                               named_args: {}
                           - FuncCall:
-                              name: sum
+                              name:
+                                Ident: sum
                               args:
                                 - Ident: salary
                               named_args: {}
                           - FuncCall:
-                              name: average
+                              name:
+                                Ident: average
                               args:
                                 - Ident: gross_salary
                               named_args: {}
                           - FuncCall:
-                              name: sum
+                              name:
+                                Ident: sum
                               args:
                                 - Ident: gross_salary
                               named_args: {}
                           - FuncCall:
-                              name: average
+                              name:
+                                Ident: average
                               args:
                                 - Ident: gross_cost
                               named_args: {}
@@ -97,7 +108,8 @@ Query:
                               name: sum_gross_cost
                               expr:
                                 FuncCall:
-                                  name: sum
+                                  name:
+                                    Ident: sum
                                   args:
                                     - Ident: gross_cost
                                   named_args: {}
@@ -108,12 +120,14 @@ Query:
                     named_args: {}
               named_args: {}
           - FuncCall:
-              name: sort
+              name:
+                Ident: sort
               args:
                 - Ident: sum_gross_cost
               named_args: {}
           - FuncCall:
-              name: filter
+              name:
+                Ident: filter
               args:
                 - Binary:
                     left:
@@ -124,7 +138,8 @@ Query:
                         Integer: 200
               named_args: {}
           - FuncCall:
-              name: take
+              name:
+                Ident: take
               args:
                 - Literal:
                     Integer: 20

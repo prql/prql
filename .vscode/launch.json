@@ -1,0 +1,67 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'prql'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=prql"
+        ],
+        "filter": {
+          "name": "prql",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'prql'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=prql",
+          "--package=prql"
+        ],
+        "filter": {
+          "name": "prql",
+          "kind": "bin"
+        }
+      },
+      "args": [
+        "compile",
+        "a.prql"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'prql'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=prql",
+          "--package=prql"
+        ],
+        "filter": {
+          "name": "prql",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

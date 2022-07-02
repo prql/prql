@@ -689,7 +689,7 @@ impl TryFrom<FuncCall> for Function {
         let FuncCall { name, args, .. } = func_call;
 
         Ok(Function {
-            name: ObjectName(vec![sql_ast::Ident::new(name)]),
+            name: ObjectName(vec![sql_ast::Ident::new(name.item.into_ident().unwrap())]),
             args: args
                 .into_iter()
                 .map(|a| Expr::try_from(a.item))
@@ -777,7 +777,7 @@ impl From<Vec<Node>> for AtomicTable {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{parser::parse, analyze, resolve_and_translate, sql::load_std_lib};
+    use crate::{analyze, parser::parse, resolve_and_translate, sql::load_std_lib};
     use insta::{
         assert_debug_snapshot, assert_display_snapshot, assert_snapshot, assert_yaml_snapshot,
     };

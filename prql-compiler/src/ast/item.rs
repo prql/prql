@@ -31,6 +31,7 @@ pub enum Item {
     },
     FuncDef(FuncDef),
     FuncCall(FuncCall),
+    FuncCurry(FuncCurry),
     Type(Ty),
     Table(Table),
     SString(Vec<InterpolateItem>),
@@ -83,23 +84,32 @@ pub enum UnOp {
 pub struct ListItem(pub Node);
 
 /// Function call.
-///
-/// Note that `named_args` cannot be determined during parsing, but only during resolving.
-/// Until then, they are stored in args as named expression.
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct FuncCall {
-    pub name: Ident,
+    pub name: Box<Node>,
     pub args: Vec<Node>,
     pub named_args: HashMap<Ident, Box<Node>>,
 }
 
 impl FuncCall {
-    pub fn without_args(name: Ident) -> Self {
+    pub fn without_args(name: Node) -> Self {
         FuncCall {
-            name,
-            ..Default::default()
+            name: Box::new(name),
+            args: vec![],
+            named_args: HashMap::new(),
         }
     }
+}
+
+/// A function call with missing positional arguments
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+pub struct FuncCurry {
+    pub def_id: usize,
+
+    pub args: Vec<Node>,
+
+    // same order as in FuncDef
+    pub named_args: Vec<Option<Node>>,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -306,7 +316,7 @@ impl Display for Item {
                 UnOp::Not => write!(f, "not {}", expr.item)?,
             },
             Item::FuncCall(func_call) => {
-                f.write_str(func_call.name.as_str())?;
+                write!(f, "{:}", func_call.name.item)?;
 
                 for (name, arg) in &func_call.named_args {
                     write!(f, " {name}: {}", arg.item)?;
@@ -314,6 +324,9 @@ impl Display for Item {
                 for arg in &func_call.args {
                     write!(f, " {}", arg.item)?;
                 }
+            }
+            Item::FuncCurry(_) => {
+                write!(f, "(func ? -> ?)")?;
             }
             Item::SString(parts) => {
                 display_interpolation(f, "s", parts)?;
