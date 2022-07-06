@@ -16,3 +16,6 @@ prql-compiler = {path = "../prql-compiler"}
 
 [build-dependencies]
 pyo3-build-config = "0.16.5"
+
+[dev-dependencies]
+insta = {version = "1.14.0", features = []}

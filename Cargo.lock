@@ -1158,6 +1158,7 @@ dependencies = [
 name = "prql-python"
 version = "0.2.1"
 dependencies = [
+ "insta",
  "prql-compiler",
  "pyo3",
  "pyo3-build-config",

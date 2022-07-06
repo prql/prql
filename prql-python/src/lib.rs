@@ -26,15 +26,12 @@ fn prql_python(_py: Python, m: &PyModule) -> PyResult<()> {
 #[cfg(test)]
 mod test {
     use super::*;
+    use insta::assert_snapshot;
     use prql_compiler::Result;
 
     #[test]
     fn parse_for_python() -> Result<()> {
-        assert_eq!(
-            to_sql("from employees | filter (age | in 20..30)")?,
-            "SELECT\n  employees.*\nFROM\n  employees\nWHERE\n  age BETWEEN 20\n  AND 30"
-        );
-
+        assert_snapshot!(to_sql("from employees | filter age 10..30").unwrap());
         Ok(())
     }
 }
