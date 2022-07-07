@@ -14,7 +14,7 @@ use super::Context;
 ///
 /// Note that this removes function declarations from AST and saves them as current context.
 pub fn resolve(nodes: Vec<Node>, context: Context) -> Result<(Vec<Node>, Context)> {
-    let mut resolver = Resolver { context };
+    let mut resolver = Resolver::new(context);
 
     let nodes = resolver.fold_nodes(nodes)?;
 
@@ -24,6 +24,23 @@ pub fn resolve(nodes: Vec<Node>, context: Context) -> Result<(Vec<Node>, Context
 /// Can fold (walk) over AST and for each function call or variable find what they are referencing.
 pub struct Resolver {
     pub context: Context,
+
+    namespace: Namespace,
+}
+
+impl Resolver {
+    fn new(context: Context) -> Self {
+        Resolver {
+            context,
+            namespace: Namespace::FunctionsColumns,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Namespace {
+    FunctionsColumns,
+    Tables,
 }
 
 impl AstFold for Resolver {
@@ -127,12 +144,27 @@ impl AstFold for Resolver {
 }
 
 impl Resolver {
+    pub fn resolve_name(&mut self, name: &str, span: Option<Span>) -> Result<Option<usize>> {
+        match self.namespace {
+            Namespace::Tables => {
+                // TODO: resolve tables
+                Ok(None)
+            }
+            Namespace::FunctionsColumns => match self.context.lookup_name(name, span) {
+                Ok(id) => Ok(Some(id)),
+                Err(e) => bail!(Error::new(Reason::Simple(e)).with_span(span)),
+            },
+        }
+    }
+
     fn fold_function(
         &mut self,
         curry: FuncCurry,
         args: Vec<Node>,
         named_args: HashMap<String, Box<Node>>,
     ) -> Result<Node, anyhow::Error> {
+        let prev_namespace = self.namespace.clone();
+
         let id = Some(curry.def_id);
         let func_def = self.context.declarations.get_func(id)?.clone();
 
@@ -140,7 +172,8 @@ impl Resolver {
         let args_len = curry.args.len();
 
         let enough_args = args_len >= func_def.positional_params.len();
-        Ok(if enough_args {
+
+        let r = if enough_args {
             super::materializer::materialize(func_def, curry)?
         } else {
             let mut node = Node::from(Item::FuncCurry(curry));
@@ -151,7 +184,9 @@ impl Resolver {
             node.ty = Some(Ty::Function(ty));
 
             node
-        })
+        };
+        self.namespace = prev_namespace;
+        Ok(r)
     }
 
     fn apply_args_to_curry(
@@ -167,7 +202,7 @@ impl Resolver {
                 .ok_or_else(|| anyhow::anyhow!("to much arguments"))?;
 
             // fold
-            let arg = self.fold_node(arg)?;
+            let arg = self.fold_function_arg(arg, param)?;
 
             // validate type
             if let Some(param_ty) = &param.ty {
@@ -192,7 +227,7 @@ impl Resolver {
                     .ok_or_else(|| anyhow::anyhow!("unknown named argument"))?;
 
                 // fold
-                let arg = self.fold_node(*arg)?;
+                let arg = self.fold_function_arg(*arg, param)?;
 
                 // validate type
                 if let Some(param_ty) = &param.ty {
@@ -204,5 +239,26 @@ impl Resolver {
         }
 
         Ok(curry)
+    }
+
+    fn fold_function_arg(&mut self, mut arg: Node, param: &FuncParam) -> Result<Node> {
+        match param.ty.as_ref() {
+            Some(Ty::Unresolved) => Ok(arg),
+            Some(expected) if Ty::Literal(TyLit::Table) <= *expected => {
+                self.namespace = Namespace::Tables;
+
+                let (alias, expr) = arg.clone().into_name_and_expr();
+                let name = expr.unwrap(Item::into_ident, "ident").with_help(
+                    "Inline tables expressions are not yet supported. You can only pass a table name.",
+                )?;
+
+                arg.declared_at = Some(self.context.declare_table(name, alias));
+                Ok(arg)
+            }
+            _ => {
+                self.namespace = Namespace::FunctionsColumns;
+                self.fold_node(arg)
+            }
+        }
     }
 }

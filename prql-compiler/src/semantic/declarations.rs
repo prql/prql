@@ -29,7 +29,7 @@ impl Declarations {
     }
 
     pub fn get_func(&self, id: Option<usize>) -> Result<&FuncDef> {
-        let id = id.context("unresolved function def?")?;
+        let id = id.context("unresolved function def?").unwrap();
         let (decl, _span) = &self.0[id];
         decl.as_function().context("expected function definition?")
     }
