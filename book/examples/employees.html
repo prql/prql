@@ -147,7 +147,8 @@ $ git clone https://github.com/vrajmohan/pgsql-sample-data.git
 $ psql -U postgres -d employees -f pgsql-sample-data/employee/employees.dump
 </code></pre>
 <p>Execute a PRQL query:</p>
-<pre><code>$ cargo run compile examples/employees/average-title-salary.prql | psql -U postgres -d employees
+<pre><code>$ cd prql-compiler
+$ cargo run compile examples/employees/average-title-salary.prql | psql -U postgres -d employees
 </code></pre>
 <h2 id="task-1"><a class="header" href="#task-1">Task 1</a></h2>
 <blockquote>
