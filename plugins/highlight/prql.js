@@ -2,8 +2,6 @@
 // https://github.com/prql/prql/blob/main/reference/highlight-prql.js
 //
 // TODO: can we import one from the other at build time?
-// Syntax highlighting for PRQL.
-
 formatting = function (hljs) {
   const TRANSFORMS = [
     "from",
@@ -54,7 +52,6 @@ formatting = function (hljs) {
         end: '"',
         relevance: 10,
       },
-
       {
         // normal string
         scope: "string",
@@ -103,16 +100,6 @@ hljs.registerLanguage("prql", formatting);
 hljs.registerLanguage("prql_no_test", formatting);
 hljs.registerLanguage("elm", formatting);
 
-// This file is inserted after the default highlight.js invocation, which tags
-// unknown-language blocks with CSS classes but doesn't highlight them.
-Array.from(document.querySelectorAll("code.language-prql")).forEach(
-  (a) => console.log(a) || hljs.highlightBlock(a)
-);
+// This line should only exists in the website, not the book.
 
-Array.from(document.querySelectorAll("code.language-prql_no_test")).forEach(
-  (a) => console.log(a) || hljs.highlightBlock(a)
-);
-
-Array.from(document.querySelectorAll("code.language-elm")).forEach(
-  (a) => console.log(a) || hljs.highlightBlock(a)
-);
+hljs.highlightAll();
