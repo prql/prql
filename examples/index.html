@@ -62,81 +62,9 @@ immediately wrapped in a <code>group</code> transform containing the columns to 
 for code to construct or edit PRQL queries. In SQL, adding a filter to a query
 involves parsing the query to find and then modify the <code>WHERE</code> statement, or
 wrapping the existing query in a CTE. In PRQL, adding a filter just involves
-appending a <code>filter</code> transformation to the query.</p><h2 id=a-more-complex-example>A more complex example</h2><p>Here&rsquo;s another SQL query, which calculates returns from prices on days with
-valid prices.</p><blockquote><p>The implemented version of PRQL supports some but not all these features.</p></blockquote><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sql data-lang=sql><span style=display:flex><span><span style=color:#66d9ef>WITH</span> total_returns <span style=color:#66d9ef>AS</span> (
-</span></span><span style=display:flex><span>  <span style=color:#66d9ef>SELECT</span>
-</span></span><span style=display:flex><span>    date,
-</span></span><span style=display:flex><span>    sec_id,
-</span></span><span style=display:flex><span>    <span style=color:#75715e>-- Can&#39;t use a `WHERE` clause, as it would affect the row that the `LAG` function referenced.
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>IF</span>(is_valid_price, price_adjusted <span style=color:#f92672>/</span> LAG(price_adjusted, <span style=color:#ae81ff>1</span>) OVER
-</span></span><span style=display:flex><span>      (PARTITION <span style=color:#66d9ef>BY</span> sec_id <span style=color:#66d9ef>ORDER</span> <span style=color:#66d9ef>BY</span> date) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> dividend_return, <span style=color:#66d9ef>NULL</span>) <span style=color:#66d9ef>AS</span> return_total,
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>IF</span>(is_valid_price, price_adjusted_usd <span style=color:#f92672>/</span> LAG(price_adjusted_usd, <span style=color:#ae81ff>1</span>) OVER
-</span></span><span style=display:flex><span>      (PARTITION <span style=color:#66d9ef>BY</span> sec_id <span style=color:#66d9ef>ORDER</span> <span style=color:#66d9ef>BY</span> date) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> dividend_return, <span style=color:#66d9ef>NULL</span>) <span style=color:#66d9ef>AS</span> return_usd,
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>IF</span>(is_valid_price, price_adjusted <span style=color:#f92672>/</span> LAG(price_adjusted, <span style=color:#ae81ff>1</span>) OVER
-</span></span><span style=display:flex><span>      (PARTITION <span style=color:#66d9ef>BY</span> sec_id <span style=color:#66d9ef>ORDER</span> <span style=color:#66d9ef>BY</span> date) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> dividend_return, <span style=color:#66d9ef>NULL</span>)
-</span></span><span style=display:flex><span>      <span style=color:#f92672>-</span> interest_rate <span style=color:#f92672>/</span> <span style=color:#ae81ff>252</span> <span style=color:#66d9ef>AS</span> return_excess,
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>IF</span>(is_valid_price, price_adjusted_usd <span style=color:#f92672>/</span> LAG(price_adjusted_usd, <span style=color:#ae81ff>1</span>) OVER
-</span></span><span style=display:flex><span>      (PARTITION <span style=color:#66d9ef>BY</span> sec_id <span style=color:#66d9ef>ORDER</span> <span style=color:#66d9ef>BY</span> date) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> dividend_return, <span style=color:#66d9ef>NULL</span>)
-</span></span><span style=display:flex><span>      <span style=color:#f92672>-</span> interest_rate <span style=color:#f92672>/</span> <span style=color:#ae81ff>252</span> <span style=color:#66d9ef>AS</span> return_usd_excess
-</span></span><span style=display:flex><span>  <span style=color:#66d9ef>FROM</span> prices
-</span></span><span style=display:flex><span>)
-</span></span><span style=display:flex><span><span style=color:#66d9ef>SELECT</span>
-</span></span><span style=display:flex><span>  <span style=color:#f92672>*</span>,
-</span></span><span style=display:flex><span>  return_total <span style=color:#f92672>-</span> (interest_rate <span style=color:#f92672>/</span> <span style=color:#ae81ff>252</span>) <span style=color:#66d9ef>AS</span> return_excess,
-</span></span><span style=display:flex><span>  EXP(<span style=color:#66d9ef>SUM</span>(LN(GREATEST(<span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> return_total <span style=color:#f92672>-</span> (interest_rate <span style=color:#f92672>/</span> <span style=color:#ae81ff>252</span>), <span style=color:#ae81ff>0</span>.<span style=color:#ae81ff>01</span>))) OVER (<span style=color:#66d9ef>ORDER</span> <span style=color:#66d9ef>BY</span> date)) <span style=color:#66d9ef>AS</span> return_excess_index
-</span></span><span style=display:flex><span><span style=color:#66d9ef>FROM</span> total_returns
-</span></span><span style=display:flex><span><span style=color:#66d9ef>JOIN</span> interest_rates <span style=color:#66d9ef>USING</span> (date)
-</span></span></code></pre></div><blockquote><p>This might seem like a convoluted example, but it&rsquo;s taken from a real query.
-Indeed, it&rsquo;s also simpler and smaller than the full logic — note that it
-starts from <code>price_adjusted</code>, whose logic had to be split into a previous
-query to avoid the SQL becoming even less readable.</p></blockquote><p>Here&rsquo;s the same query with PRQL:</p><pre tabindex=0><code class=language-prql data-lang=prql>prql version:0.3 db:snowflake                         # PRQL version &amp; database name.
-
-func excess x -&gt; (x - interest_rate) / 252            # Functions are clean and simple.
-func if_valid x -&gt; is_valid_price ? x : null
-func lag_day x -&gt; group sec_id (                      # `group` is used for window partitions too
-  sort date
-  window (                                            # `window` runs a pipeline over each window
-    lag 1 x                                           # `lag 1 x` lags the `x` col by 1
-  )
-)
-
-func ret x -&gt; x / (x | lag_day) - 1 + dividend_return
-
-from prices
-join interest_rates [date]
-select [                                              # `select` only includes unnamed columns, unlike `derive`
-  return_total =      prices_adj   | ret | if_valid   # `|` can be used rather than newlines
-  return_usd =        prices_usd   | ret | if_valid
-  return_excess =     return_total | excess
-  return_usd_excess = return_usd   | excess
-  return_index = (                                    # No need for a CTE
-    return_total + 1
-    excess
-    greatest 0.01
-    ln
-    group sec_id (                                    # Complicated logic remains clear(er)
-      sort date
-      window ..current (                              # Rolling sum
-        sum
-      )
-    )
-    exp
-  )
-]
-</code></pre><p>Because we define the functions once rather than copying & pasting the code, we
-get all the benefits of encapsulation and extensibility — we have reliable &
-tested functions, whose purpose is explicit, which we can share across queries
-and between colleagues.</p><p>We needed a CTE in the SQL query, because the lack of variables would have
-required a nested window clause, which isn&rsquo;t allowed. With PRQL, our logic isn&rsquo;t
-constrained by these arbitrary constraints — and is more compressed as a result.</p><p>The larger query demonstrates PRQL orthogonality. PRQL has fewer keywords
-than SQL, and each of them does something specific and composable; for example:</p><ul><li><code>group</code> maps a pipeline over groups; whether in a table context — <code>GROUP BY</code>
-in SQL — or within a <code>window</code> — <code>PARTITION BY</code> in SQL.</li><li>A transform in context of a <code>group</code> does the same transformation to the group
-as it would to the table — for example finding the rolling sum of a column.
-For more on this equivalence, check out
-<a href=https://prql-lang.org/book/transforms/group.html target=_blank rel=noopener><code>group</code>&rsquo;s
-documentation<sup><i class="bx bx-link-external"></i></sup></a></li><li><code>filter</code> filters out rows which don&rsquo;t meet a condition. That can be before an
-aggregate — <code>WHERE</code> in SQL — after an aggregate — <code>HAVING</code> in SQL — or within
-a <code>window</code> — <code>QUALIFY</code> in SQL.</li></ul></article></main><footer id=footer><div class=container><div class=row><div class="col-md-6 py-3"><h3>Help the project</h3><ul><li>Send a link to PRQL to a couple of people whose opinion you respect.</li><li>Rewrite any of your own queries to PRQL to see if it makes sense.
+appending a <code>filter</code> transformation to the query.</p><p>For more examples, check out the
+<a href=https://prql-lang.org/book/ target=_blank rel=noopener>PRQL Book<sup><i class="bx bx-link-external"></i></sup></a>
+.</p></article></main><footer id=footer><div class=container><div class=row><div class="col-md-6 py-3"><h3>Help the project</h3><ul><li>Send a link to PRQL to a couple of people whose opinion you respect.</li><li>Rewrite any of your own queries to PRQL to see if it makes sense.
 You can use the
 <a href=https://prql-lang.org/playground target=_blank rel=noopener>playground<sup><i class="bx bx-link-external"></i></sup></a>
 and submit issues
