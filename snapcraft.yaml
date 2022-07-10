@@ -1,0 +1,46 @@
+name: prql-compiler
+adopt-info: prql-compiler
+base: core20
+summary: Pipelined Relational Query Language, pronounced "Prequel"
+description: |
+  PRQL is a modern language for transforming data — a simple, powerful,
+  pipelined SQL replacement. Like SQL, it's readable, explicit and
+  declarative. Unlike SQL, it forms a logical pipeline of transformations,
+  and supports abstractions such as variables and functions. It can be
+  used with any database that uses SQL, since it transpiles to SQL. *NOTE*:
+  this snap packs only the `prql-compiler`, and not the bindings.
+license: Apache-2.0
+grade: stable
+confinement: strict
+issues: https://github.com/prql/prql/issues
+source-code: https://github.com/prql/prql.git
+website: https://prql-lang.org/
+icon: website/static/img/icon.svg
+
+apps:
+  prql-compiler:
+    command: bin/prql-compiler
+    plugs:
+      - home
+      - removable-media
+
+parts:
+  prql-compiler:
+    plugin: rust
+    source: https://github.com/prql/prql.git
+    build-packages:
+        - rust-all
+    override-build: |
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      last_committed_tag_ver="$(echo ${last_committed_tag} | sed 's/v//')"
+      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "beta:" { print $2 }' || echo '0.0.0')"
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag_ver}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+        cd ../src
+        git checkout "${last_committed_tag}"
+      fi
+      cargo install --locked --path prql-compiler --root /root/parts/prql-compiler/install --force
+      snapcraftctl set-version $(git -C ../src describe --tags  | sed 's/v//')
