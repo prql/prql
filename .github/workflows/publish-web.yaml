@@ -1,0 +1,53 @@
+name: publish-gh-pages
+on:
+  push:
+    branches:
+      - main
+  # Called by pull-request when specifically requested
+  workflow_call:
+
+jobs:
+  publish-gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          target: wasm32-unknown-unknown
+          toolchain: stable
+
+      # Website setup
+      - name: Setup hugo
+        uses: peaceiris/actions-hugo@v2.5.0
+
+      # Book setup
+      - name: 💰 Cache
+        uses: Swatinem/rust-cache@v1
+      - uses: peaceiris/actions-mdbook@v1
+      - uses: actions-rs/install@v0.1
+        with:
+          crate: mdbook-admonish
+          version: 1.7.0
+          use-tool-cache: true
+
+      # Playground setup
+      - uses: jetli/wasm-bindgen-action@v0.1.0
+      - uses: jetli/wasm-pack-action@v0.3.0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "npm"
+          cache-dependency-path: playground/package-lock.json
+
+      - uses: arduino/setup-task@v1
+      - name: 🕷️ Build website
+        run: task build-web
+
+      - name: 🚢 Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: website/public/

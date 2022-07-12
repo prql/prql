@@ -4,11 +4,11 @@
 /// - Converts them to SQL using insta, raising an error if there's a diff.
 /// - Replaces the PRQL code block with a comparison table.
 //
-// Overall, this is sligthly overengineered — it's complicated and took a long
-// time to write. The intention is good — have a version of the SQL that's
-// committed into the repo, and join our tests with our docs. But it feels like
-// overly custom code for quite a general problem, even if our preferences are
-// slightly different from the general case.
+// Overall, this is overengineered — it's complicated and took a long time to
+// write. The intention is good — have a version of the SQL that's committed
+// into the repo, and join our tests with our docs. But it feels like overly
+// custom code for quite a general problem, even if our preferences are slightly
+// different from the general case.
 //
 // Possibly we should be using something like pandoc /
 // https://github.com/gpoore/codebraid / which would run the transformation for

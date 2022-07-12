@@ -1,58 +1,89 @@
 # prql-js
 
-JavaScript bindings for [`prql-compiler`](https://github.com/prql/prql/). Check
-out <https://prql-lang.org> for more context.
+JavaScript bindings for [`prql-compiler`](https://github.com/prql/prql/). Check out <https://prql-lang.org> for more
+context.
+
+## Installation
+
+```sh
+npm install prql-js
+```
+
+## Usage
+
+Currently these functions are exposed
+
+```javascript
+function compile(prql_string) # returns CompileResult
+function to_sql(prql_string) # returns SQL string
+function to_json(prql_string) # returns JSON string ( needs JSON.parse() to get the json)
+```
+
+### From NodeJS
+
+```javascript
+const prql = require("prql-js");
+
+const { sql, error } = compile(`from employees | select first_name`);
+console.log(sql);
+// handle error as well...
+```
+
+### From a Browser
+
+```html
+<html>
+  <head>
+    <script src="./node_modules/prql-js/dist/web/prql_js.js"></script>
+    <script>
+      const { compile } = wasm_bindgen;
+
+      async function run() {
+        await wasm_bindgen("./node_modules/prql-js/dist/web/prql_js_bg.wasm");
+        const { sql, error } = compile("from employees | select first_name");
+
+        console.log(sql);
+        // handle error as well...
+      }
+
+      run();
+    </script>
+  </head>
+
+  <body></body>
+</html>
+```
+
+### From a Framework or a Bundler
+
+```typescript
+import compile from "prql-js/dist/bundler";
+
+const { sql, error } = compile(`from employees | select first_name`);
+console.log(sql);
+// handle error as well...
+```
+
+## Notes
 
 This uses
 [`wasm-pack`](https://rustwasm.github.io/docs/wasm-pack/tutorials/npm-browser-packages/index.html)
 to generate bindings[^1].
 
 [^1]:
-    though we would be very open to other approaches, and used `trunk`
-    successfully in a rust-driven approach to this, RIP `prql-web`.
 
-## Installation
-
-To install the currently published version:
-
-```sh
-npm install prql-js
-```
-
-This package is built to target a bundler (i.e. webpack). To use it with Node.js
-or import it directly in a browser as an ES module, [build it using a suitable
-`--target`](https://rustwasm.github.io/docs/wasm-pack/commands/build.html).
-
-## Usage
-
-```js
-import compile from "prql-js";
-
-const sql = compile(`from employees | select first_name`);
-console.log(sql);
-```
-
-Prints:
-
-```sql
-SELECT
-  first_name
-FROM
-  employees
-```
-
-For more information about the language, see [reference book](https://prql-lang.org/book).
+though we would be very open to other approaches, and used `trunk`
+successfully in a rust-driven approach to this, RIP `prql-web`.
 
 ## Development
 
 Build:
 
 ```sh
-wasm-pack build
+npm run build-all
 ```
 
-This builds a node package in the `pkg` path. An example of including that as a
-dependency is in [`playground`](../playground/package.json).
+This builds Node, bundler and web packages in the `dist` path.
 
 Test:
 

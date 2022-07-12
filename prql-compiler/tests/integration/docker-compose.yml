@@ -1,0 +1,20 @@
+version: "3"
+services:
+  postgres:
+    build:
+      dockerfile: postgres.dockerfile
+      context: .
+    healthcheck:
+      test: /usr/bin/pg_isready -U postgres
+      interval: 5s
+      timeout: 10s
+      retries: 120
+    ports:
+      - 5432:5432
+  test:
+    build:
+      dockerfile: test.dockerfile
+      context: .
+    depends_on:
+      postgres:
+        condition: service_healthy

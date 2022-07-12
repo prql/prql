@@ -1,7 +1,7 @@
 import "./Workbench.css";
 
 import React from "react";
-import * as prql from "prql-js";
+import * as prql from "prql-js/dist/bundler";
 
 import * as monacoTheme from "./monaco-theme.json";
 import * as monaco from "monaco-editor";

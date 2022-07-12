@@ -1,30 +1,23 @@
 name: build-wheel
 description: "Use maturin to build python dists of prql-python. Conditional if checks ensure only the correct OS build is called."
 
-inputs:
-  os:
-    description: "Operating system"
-    required: True
-    default: "ubuntu-latest"
-
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v2
     - uses: Swatinem/rust-cache@v1
     - uses: messense/maturin-action@v1
-      if: inputs.os == 'ubuntu-latest'
+      if: runner.os == 'Linux'
       with:
         manylinux: auto
         command: build
         args: --release -o dist -m prql-python/Cargo.toml
     - uses: messense/maturin-action@v1
-      if: inputs.os == 'windows-latest'
+      if: runner.os == 'Windows'
       with:
         command: build
         args: --release --no-sdist -o dist -m prql-python/Cargo.toml
     - uses: messense/maturin-action@v1
-      if: inputs.os == 'macos-latest'
+      if: runner.os == 'macOS'
       with:
         command: build
         args: --release --no-sdist -o dist --universal2 -m prql-python/Cargo.toml

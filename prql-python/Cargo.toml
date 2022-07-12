@@ -2,7 +2,8 @@
 build = "build.rs"
 edition = "2021"
 name = "prql-python"
-version = "0.2.1"
+publish = false
+version = "0.2.2"
 
 [lib]
 crate-type = ["cdylib"]
@@ -16,3 +17,8 @@ prql-compiler = {path = "../prql-compiler"}
 
 [build-dependencies]
 pyo3-build-config = "0.16.5"
+
+[package.metadata.release]
+shared-version = true
+tag-name = "{{version}}"
+tag-prefix = ""

@@ -7,18 +7,18 @@
 }
 .tabs {
   display: flex;
-  flex-wrap: wrap;
   flex-grow: 1;
   overflow-y: hidden;
 }
 .tab {
   flex-grow: 1;
   flex-basis: 0;
-  min-width: 30rem;
+  max-width: 50%;
   height: 100%;
 
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 .tab:not(:first-child) {
   border-left: 1px solid #666;

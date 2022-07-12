@@ -1509,6 +1509,23 @@ take 20
 
         assert!(resolve_and_translate(query).is_err());
 
+        let query: Query = parse(
+            r###"
+        from events
+        filter (date | in @1776-07-04..@1787-09-17)
+        "###,
+        )?;
+
+        assert_display_snapshot!((resolve_and_translate(query)?), @r###"
+        SELECT
+          events.*
+        FROM
+          events
+        WHERE
+          date BETWEEN DATE '1776-07-04'
+          AND DATE '1787-09-17'
+        "###);
+
         Ok(())
     }
 

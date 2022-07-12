@@ -1,0 +1,17 @@
+[package]
+edition = "2021"
+name = "prql-java"
+publish = false
+version = "0.2.2"
+
+[lib]
+crate_type = ["cdylib"]
+
+[dependencies]
+jni = "0.19.0"
+prql-compiler = {path = "../prql-compiler"}
+
+[package.metadata.release]
+shared-version = true
+tag-name = "{{version}}"
+tag-prefix = ""

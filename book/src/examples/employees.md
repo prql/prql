@@ -10,6 +10,7 @@ Clone and init the database (requires a local PostgreSQL instance):
 
 Execute a PRQL query:
 
+    $ cd prql-compiler
     $ cargo run compile examples/employees/average-title-salary.prql | psql -U postgres -d employees
 
 ## Task 1

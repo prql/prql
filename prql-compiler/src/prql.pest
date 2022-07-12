@@ -29,8 +29,18 @@ pipe = _{ NEWLINE | "|" }
 pipeline = { WHITESPACE* ~ expr_call ~ (pipe ~ expr_call)* }
 
 // We include backticks because some DBs use them (e.g. BigQuery) and we don't,
-// so we pass them through.
-ident = @{ !operator ~ !(keyword ~ WHITESPACE) ~ (ASCII_ALPHA | "$" | "`") ~ (ASCII_ALPHANUMERIC | "." | "_" | "*" | "`")* }
+// so we pass anything within them directly through, including otherwise invalid
+// idents, like those with hyphens. Possibly we should consider applying this to
+// expressions rather than just idents — we can adjust as we see more cases.
+ident = @{ !operator ~ !(keyword ~ WHITESPACE) ~ ident_start ~ ("." ~ ident_next)* }
+// Either a normal ident (starting with a letter, `$` or `_`), or any string surrounded
+// by backticks.
+ident_start = _{ ((ASCII_ALPHA | "$" | "_") ~ (ASCII_ALPHANUMERIC | "_" )* ) | ident_backticks+ }
+// We allow `e.*`, but not just `*`, since it might conflict with multiply in
+// some cases.
+ident_next = _{ ident_start | "*" }
+// Anything surrounded by backticks, we pass through.
+ident_backticks = _{ "`" ~ (!NEWLINE ~ !"`" ~ ANY)* ~ "`" }
 // For sorting
 signed_ident = { ( "+" | "-" ) ~ ident }
 keyword = _{ "prql" | "table" | "func" }
@@ -122,7 +132,7 @@ operator = _{ operator_unary | operator_mul | operator_add | operator_compare | 
 operator_unary = ${ "-" | "+" | "!" }
 operator_mul = ${ "*" | "/" | "%" }
 operator_add = ${ "+" | "-" }
-operator_compare = ${ "==" | "!=" | ">" | "<" | ">=" | "<=" }
+operator_compare = ${ "==" | "!=" | ">=" | "<=" | ">" | "<" }
 operator_logical = ${ ("and" | "or") ~ &WHITESPACE }
 operator_coalesce = ${ "??" }
 
@@ -144,7 +154,10 @@ timestamp_inner = ${ date_inner ~ "T" ~ time_inner }
 
 // We can use this when want to ensure something is ending, like a date, so `@20-01-0`
 // isn't treated like a time `@20-01` `-` (minus) `0`.
-end_expr = _{ WHITESPACE | "," | ")" | "]" | EOI | NEWLINE }
+// (Not sure whether `..` should be here or in the items that allow it; feel
+// free to demote it to those items if `end_expr` is used somewhere where it's
+// not supported)
+end_expr = _{ WHITESPACE | "," | ")" | "]" | EOI | NEWLINE | ".." }
 
 // We pass text between `{{` and `}}` through, so dbt can use Jinja.
 jinja = { ("{{" ~ (!"}}" ~ ANY)* ~ "}}") }

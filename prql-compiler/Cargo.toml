@@ -5,7 +5,7 @@ license = "Apache-2.0"
 name = "prql-compiler"
 repository = "https://github.com/prql/prql"
 rust-version = "1.59.0"
-version = "0.2.1"
+version = "0.2.2"
 
 [features]
 # We previously had `cli` not compile by default, because of an issue with
@@ -45,6 +45,7 @@ features = ["derive"]
 version = "1.0.137"
 
 [dev-dependencies]
+chrono = "0.4"
 criterion = "0.3.5"
 globset = "0.4.8"
 insta = {version = "1.15.0", features = ["colors", "glob"]}
@@ -53,6 +54,21 @@ pulldown-cmark-to-cmark = "10.0.1"
 similar = "2.1.0"
 walkdir = "2.3.2"
 
+# For integration tests
+[target.'cfg(not(target_family="wasm"))'.dev-dependencies]
+postgres = "0.19.3"
+rusqlite = {version = "0.27.0", features = ["bundled", "csvtab"]}
+
+# Re-enable on windows when duckdb supports it
+# https://github.com/wangfenjin/duckdb-rs/issues/62
+[target.'cfg(not(any(target_family = "windows", target_family="wasm")))'.dev-dependencies]
+duckdb = {version = "0.4.0", features = ["bundled", "chrono"]}
+
 [[bench]]
 harness = false
 name = "bench"
+
+[package.metadata.release]
+shared-version = true
+tag-name = "{{version}}"
+tag-prefix = ""

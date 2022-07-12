@@ -1,0 +1,32 @@
+# Workflow to check that the workflows in Taskfile pass.
+name: taskfile
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+    paths:
+      - Taskfile.yml
+      - .github/workflows/test-taskfile.yaml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-taskfile:
+    runs-on: macos-latest
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v3
+      - name: 💰 Cache
+        uses: Swatinem/rust-cache@v1
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: task setup-dev
+      # This also encompases `build-all`
+      - run: task test-all

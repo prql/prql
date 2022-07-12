@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  test-rust:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -28,10 +28,35 @@ jobs:
     steps:
       - name: 📂 Checkout code
         uses: actions/checkout@v3
-      - uses: ./.github/actions/cargo-test
+      - uses: ./.github/actions/test-rust
         with:
           target: ${{ matrix.target }}
           target_option: ${{ matrix.target_option }}
+
+  test-python:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/test-python
+
+  test-java:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # TODO: enable for windows
+        os: [ubuntu-latest, macos-latest]
+      # Java test is simple enough that it's not worth splitting out into a
+      # separate action. These three lines is copied to test-java, which runs on
+      # any java change.
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v3
+      - working-directory: prql-java/java/
+        run: ./mvnw test
 
   code-cov:
     runs-on: ubuntu-latest
@@ -46,7 +71,7 @@ jobs:
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          # TODO: move this exclude to a config file.
+          # TODO: move this exclusion to a config file.
           args: "--workspace --exclude prql-python -- --test-threads 1"
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v3
@@ -55,10 +80,3 @@ jobs:
         with:
           name: code-coverage-report
           path: cobertura.xml
-
-  # TODO: if the workflow depth was > two, then this would let us run the python
-  # workflow with a label.
-  #
-  # python:
-  #   name: Python
-  #   uses: ./.github/workflows/python.yaml

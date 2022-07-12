@@ -54,8 +54,7 @@ formatting = function (hljs) {
       {
         // date
         scope: "string",
-        begin: "@",
-        end: " ",
+        match: /@(\d*|-|\.\d|:)+/,
         relevance: 10,
       },
       {
@@ -65,11 +64,26 @@ formatting = function (hljs) {
         end: '"',
         relevance: 10,
       },
+
       {
         // normal string
         scope: "string",
         begin: '"',
         end: '"',
+        relevance: 10,
+      },
+      {
+        // number
+        scope: "number",
+        // Slightly modified from https://stackoverflow.com/a/23872060/3064736;
+        // it requires a number after a decimal point, so ranges appear as ranges.
+        match: /[+-]?((\d+(\.\d+)?)|(\.\d+))/,
+        relevance: 10,
+      },
+      {
+        // range
+        scope: "symbol",
+        match: /\.{2}/,
         relevance: 10,
       },
 
@@ -98,6 +112,8 @@ formatting = function (hljs) {
 hljs.registerLanguage("prql", formatting);
 hljs.registerLanguage("prql_no_test", formatting);
 hljs.registerLanguage("elm", formatting);
+
+// These lines should only exists in the book, not the website.
 
 // This file is inserted after the default highlight.js invocation, which tags
 // unknown-language blocks with CSS classes but doesn't highlight them.

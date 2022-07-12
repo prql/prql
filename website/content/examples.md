@@ -86,6 +86,13 @@ involves parsing the query to find and then modify the `WHERE` statement, or
 wrapping the existing query in a CTE. In PRQL, adding a filter just involves
 appending a `filter` transformation to the query.
 
+For more examples, check out the [PRQL Book](https://prql-lang.org/book/).
+
+<!--
+
+TODO: This was a nice example for the proposal, but until we get functions which can contain column names,
+it doesn't compile, and so is confusing. When we get that working, we can re-enable it.
+
 ## A more complex example
 
 Here's another SQL query, which calculates returns from prices on days with
@@ -183,4 +190,4 @@ than SQL, and each of them does something specific and composable; for example:
   documentation](https://prql-lang.org/book/transforms/group.html)
 - `filter` filters out rows which don't meet a condition. That can be before an
   aggregate — `WHERE` in SQL — after an aggregate — `HAVING` in SQL — or within
-  a `window` — `QUALIFY` in SQL.
+  a `window` — `QUALIFY` in SQL. -->

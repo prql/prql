@@ -2,7 +2,7 @@ name: Cargo audit
 
 on:
   schedule:
-    - cron: "33 6 * * *"
+    - cron: "49 10 * * *"
 
 jobs:
   audit:

@@ -7,3 +7,5 @@ dist
 /*.prql
 */*.prql
 .idea
+
+target/

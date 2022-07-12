@@ -17,7 +17,7 @@
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.1",
     "monaco-editor": "^0.33.0",
-    "prql-js": "file:../prql-js/pkg",
+    "prql-js": "file:../prql-js",
     "react": "^18.1.0",
     "react-dom": "^18.2.0",
     "react-syntax-highlighter": "^15.5.0",
@@ -39,7 +39,7 @@
   "scripts": {
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "preinstall": "cd ../prql-js && wasm-pack build",
+    "preinstall": "cd ../prql-js && npm run build-bundler",
     "start": "react-scripts start",
     "test": "react-scripts test"
   },

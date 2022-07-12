@@ -425,6 +425,14 @@ take 20
     }
 
     #[test]
+    fn test_non_existent_function() -> Result<()> {
+        let query = parse(r#"from mytable | filter (myfunc col1)"#)?;
+        assert!(resolve_names(query.nodes, None).is_err());
+
+        Ok(())
+    }
+
+    #[test]
     fn test_run_functions_args() -> Result<()> {
         let query = parse(
             r#"

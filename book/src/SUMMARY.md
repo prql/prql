@@ -44,7 +44,6 @@
 - [Examples](./examples/README.md)
   - [Variables](./examples/variables.md)
   - [List equivalence](./examples/list-equivalence.md)
-  - [Functions](./examples/functions.md)
   - [CTE (intermediate tables)](./examples/cte.md)
   - [SQL parameters](./examples/sql-parameters.md)
   - [Employees](./examples/employees.md)

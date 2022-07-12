@@ -20,6 +20,12 @@ cargo install prql-compiler
 cargo install --path .
 ```
 
+It can be installed via brew too:
+
+```sh
+brew install prql/prql/prql-compiler
+```
+
 ## Usage
 
 ```sh

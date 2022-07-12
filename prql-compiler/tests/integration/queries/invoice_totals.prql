@@ -1,0 +1,21 @@
+from i=invoices
+join ii=invoice_items [invoice_id]
+derive [
+    month = s"STRFTIME('%Y-%m', {i.invoice_date})",
+    day = s"STRFTIME('%Y-%m-%d', {i.invoice_date})",
+]
+group [month, day] (
+    aggregate [
+        num_orders = s"COUNT(DISTINCT {i.invoice_id})",
+        num_tracks = sum ii.quantity,
+        total_price = sum (ii.unit_price * ii.quantity),
+    ]
+)
+group [month] (
+    sort day
+    window expanding:true (
+        derive [running_total_num_tracks = sum num_tracks]
+    )
+)
+sort day
+derive [num_tracks_last_week = lag 7 num_tracks]

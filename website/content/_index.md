@@ -365,7 +365,7 @@ comments_section:
     - quote:
         text: Column aliases would have saved me hundreds of hours over the course of my career.
         author: "@dvasdekis"
-        link: "https://news.ycombinator.com/item?id=30064873"
+        link: https://news.ycombinator.com/item?id=30064873
     - tweet: "{{< tweet 1514280454890872833 >}}"
     - tweet: "{{< tweet 1485958835844100098 >}}"
     - quote:
@@ -374,10 +374,10 @@ comments_section:
           right is to start with the table and work down. This is
           an enormous readability boost in large projects and leads to great intellisense.
         author: Ruben Slabbert
-        link: "https://lobste.rs/s/oavgcx/prql_simpler_more_powerful_sql#c_nmzcd7"
+        link: https://lobste.rs/s/oavgcx/prql_simpler_more_powerful_sql#c_nmzcd7
     - tweet: "{{< tweet 1485795181198983170 >}}"
     - quote:
         text: Just wanna say, I absolutely love this.
         author: Alex Kritchevsky
-        link: "https://news.ycombinator.com/item?id=30063771"
+        link: https://news.ycombinator.com/item?id=30063771
 ---

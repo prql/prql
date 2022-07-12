@@ -1,7 +1,3 @@
-## 🎉 🎉 **Monday 2022-06-27: After several months of building, PRQL is ready to use! Check out the [0.2 Release Notes](https://github.com/prql/prql/releases/tag/0.2.0)!** 🎉 🎉
-
----
-
 # PRQL
 
 <!-- User badges on first line (language docs & chat) -->
@@ -61,6 +57,11 @@ take 1..20                                    # Range expressions (also valid he
 For more on the language, more examples & comparisons with SQL, visit
 [prql-lang.org][prql website]. To experiment with PRQL in the browser, check out
 [PRQL Playground][prql playground].
+
+## Current status
+
+After several months of building, PRQL is ready to use! Check out the [0.2
+Release Notes](https://github.com/prql/prql/releases/tag/0.2.0)!
 
 ## Get involved
 

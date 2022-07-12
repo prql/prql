@@ -1,2 +1,3 @@
-from employees
-filter (age | in 18..40)
+from events
+filter (date | in @1776-07-04..@1787-09-17)
+filter (magnitude | in 50..100)

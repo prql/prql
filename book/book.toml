@@ -1,23 +1,13 @@
 [book]
-authors = ["aljazerzen"]
 description = "Modern language for transforming data — a simple, powerful, pipelined SQL replacement"
 language = "en"
 multilingual = false
-src = "src"
 title = "PRQL Language Book"
 
 [output.html]
-additional-css = ["comparison-table.css", "mdbook-admonish.css"]
+additional-css = ["comparison-table.css", "mdbook-admonish.css", "././mdbook-admonish.css"]
 additional-js = ["highlight-prql.js"]
 git-repository-url = "https://github.com/prql/prql"
-
-# Hack to install the current version of the `mdbook-prql` preprocessor
-[preprocessor.install-prql]
-before = ["prql"]
-# We install with `--debug` because this is in the critical path of tests, and
-# runtime performance doesn't matter.
-# NB: if offline, use `cargo install --offline`
-command = "sh -c 'echo \"Installing mdbook-prql from mdbook\" 1>&2; cd $(git rev-parse --show-toplevel)/book/mdbook-prql/ && cargo install --locked --debug  --path . && exit 1'"
 
 [preprocessor.prql]
 

@@ -1,11 +1,5 @@
 name: Setup Nox
-description: "Prepare and cache nox, install poetry."
-
-inputs:
-  cache_number:
-    description: "A manually specified cache number. Useful for triggering new caches."
-    required: True
-    default: 0
+description: Prepare and cache nox
 
 runs:
   using: composite
@@ -22,11 +16,11 @@ runs:
     - uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: "Install nox"
+    - name: Install nox
       run: pipx install nox
       shell: bash
-    - name: "Cache Nox"
+    - name: Cache Nox
       uses: actions/cache@v2
       with:
         path: .nox
-        key: nox-${{inputs.cache_number }}-${{ hashFiles('prql-python/noxfile.py') }}-${{ hashFiles('prql-python/requirements.txt') }}
+        key: nox-${{ hashFiles('prql-python/noxfile.py') }}-${{ hashFiles('prql-python/requirements.txt') }}

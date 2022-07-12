@@ -42,3 +42,14 @@ the quotes. `s"average{col}"` produces `average(salary)`, without quotes.
 s-strings in user code are intended as an escape-hatch for an unimplemented
 feature. If we often need s-strings to express something, that's a sign we
 should implement it in PRQL or PRQL's stdlib.
+
+## Backticks
+
+PRQL will also pass through identifiers surrounded by backticks (including the
+backticks). Some databases — e.g. BigQuery — use this to allow identifiers which
+aren't otherwise valid; such as those containing a hyphen.
+
+```prql
+from `project-foo.dataset.table`
+join `project-bar`.`dataset`.`table` [col_bax]
+```

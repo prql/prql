@@ -2,7 +2,7 @@
 // https://github.com/prql/prql/blob/main/reference/highlight-prql.js
 //
 // TODO: can we import one from the other at build time?
-hljs.registerLanguage("prql", function (hljs) {
+formatting = function (hljs) {
   const TRANSFORMS = [
     "from",
     "select",
@@ -17,7 +17,6 @@ hljs.registerLanguage("prql", function (hljs) {
     "window",
     "prql",
   ];
-
   return {
     name: "PRQL",
     case_insensitive: true,
@@ -36,7 +35,6 @@ hljs.registerLanguage("prql", function (hljs) {
       },
       {
         // assign
-        // TODO: handle operators like `==`
         scope: { 1: "variable" },
         match: [/\w+\s*/, /=[^=]/],
         relevance: 10,
@@ -44,8 +42,7 @@ hljs.registerLanguage("prql", function (hljs) {
       {
         // date
         scope: "string",
-        begin: "@",
-        end: " ",
+        match: /@(\d*|-|\.\d|:)+/,
         relevance: 10,
       },
       {
@@ -65,7 +62,16 @@ hljs.registerLanguage("prql", function (hljs) {
       {
         // number
         scope: "number",
-        match: /-?\d+(\.\d+)?/,
+        // Slightly modified from https://stackoverflow.com/a/23872060/3064736;
+        // it requires a number after a decimal point, so ranges appear as ranges.
+        match: /[+-]?((\d+(\.\d+)?)|(\.\d+))/,
+        relevance: 10,
+      },
+      {
+        // range
+        scope: "symbol",
+        match: /\.{2}/,
+        relevance: 10,
       },
 
       // Unfortunately this just overrides any keywords. It's also not
@@ -88,6 +94,12 @@ hljs.registerLanguage("prql", function (hljs) {
       // {
     ],
   };
-});
+};
+
+hljs.registerLanguage("prql", formatting);
+hljs.registerLanguage("prql_no_test", formatting);
+hljs.registerLanguage("elm", formatting);
+
+// This line should only exists in the website, not the book.
 
 hljs.highlightAll();

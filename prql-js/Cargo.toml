@@ -3,8 +3,9 @@ description = "Javascript bindings for prql-compiler"
 edition = "2018"
 license = "Apache-2.0"
 name = "prql-js"
+publish = false
 repository = "https://github.com/prql/prql"
-version = "0.1.3"
+version = "0.2.2"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -31,3 +32,13 @@ wee_alloc = {version = "0.4.5", optional = true}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.30"
+
+[package.metadata.release]
+shared-version = true
+tag-name = "{{version}}"
+tag-prefix = ""
+
+[[package.metadata.release.pre-release-replacements]]
+file = "package.json"
+replace = '  "version": "{{version}}"'
+search = '  "version": "[\d\.]*"'

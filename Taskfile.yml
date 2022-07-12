@@ -37,6 +37,7 @@ tasks:
       - task: install-npm-dependencies
       # We only suggest, rather than install; we don't want to intrude (maybe we're being too conservative?).
       - task: suggest-vscode-extensions
+      - pre-commit install-hooks
       - cmd: |
           echo "
           🟢 Set up complete! ✅🚀"
@@ -81,7 +82,7 @@ tasks:
     status:
       - which pre-commit
     cmds:
-      - pip install -U pre-commit
+      - python3 -m pip install -U pre-commit
 
   install-brew-dependencies:
     status:
@@ -119,24 +120,36 @@ tasks:
     cmds:
       - |
         {{ range ( .targets | trim | splitLines ) -}}
-        cargo build --workspace --all-targets --target={{.}}
+        cargo build --all-targets --target={{.}}
         {{ end -}}
       - mdbook build book/
       - cd playground && npm install && npm run build
       - cd website && hugo
 
   test-all:
-    desc: Test everything, reseting snapshots. Running this isn't required when developing; it's for caching or as a reference.
+    desc: Test everything, resetting snapshots. Running this isn't required when developing; it's for caching or as a reference.
     vars:
       default_target:
         sh: default-target
     cmds:
-      # We run this first for the reasons given in
+      # We run this `run_examples` first for the reasons given in
       # `parser::test_parse_pipeline_parse_tree`. Ideally we would a) retain
       # examples in the documentation (inc. tested), b) not rely on falliable
       # tests to extract them, which include compiling prql-compiler, c) not
       # fail other compliation steps if they can't be extracted.
       - cargo insta test --accept -- run_examples
+      - task: build-all
       # Only delete unreferenced snapshots on the default target — lots are excluded under wasm.
-      - cargo insta test --accept --delete-unreferenced-snapshots -- --workspace --target={{.default_target}}
-      - cargo insta test --accept -- --workspace --target=wasm32-unknown-unknown
+      - cargo insta test --accept --delete-unreferenced-snapshots -- --target={{.default_target}}
+      - cargo insta test --accept -- --target=wasm32-unknown-unknown
+      - pre-commit run -a
+
+  build-web:
+    desc: Build the website
+    cmds:
+      - cd website && hugo --minify
+      - cd book && mdbook build
+      - mv book/book website/public/book
+      - cd playground && npm ci
+      - cd playground && npm run build
+      - mv playground/build website/public/playground
