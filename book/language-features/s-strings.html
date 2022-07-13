@@ -218,18 +218,18 @@ aren’t otherwise valid; such as those containing a hyphen.</p>
 <div>
 <h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from `project-foo.dataset.table`
-join `project-bar`.`dataset`.`table` [col_bax]
+join `project-bar.dataset.table` [col_bax]
 </code></pre>
 </div>
 <div>
 <h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
 <pre><code class="language-sql">SELECT
   `project-foo.dataset.table`.*,
-  `project-bar`.`dataset`.`table`.*,
+  `project-bar.dataset.table`.*,
   col_bax
 FROM
   `project-foo.dataset.table`
-  JOIN `project-bar`.`dataset`.`table` USING(col_bax)
+  JOIN `project-bar.dataset.table` USING(col_bax)
 </code></pre>
 </div>
 </div>
