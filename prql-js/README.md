@@ -57,7 +57,7 @@ console.log(sql);
 ### From a Framework or a Bundler
 
 ```typescript
-import compile from "prql-js/dist/bundler";
+import * as prql from "prql-js/dist/bundler";
 
 const { sql, error } = compile(`from employees | select first_name`);
 console.log(sql);
