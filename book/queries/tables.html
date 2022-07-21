@@ -142,9 +142,6 @@
                     <main>
                         <h1 id="tables"><a class="header" href="#tables">Tables</a></h1>
 <p>We can create a table — similar to a CTE in SQL — with <code>table</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">table top_50 = (
   from employees
   sort salary
@@ -154,35 +151,10 @@
 
 from another_table      # Starts a new pipeline
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    employees.*
-  FROM
-    employees
-  ORDER BY
-    salary
-  LIMIT
-    50
-), top_50 AS (
-  SELECT
-    SUM(salary)
-  FROM
-    table_0
-)
-SELECT
-  another_table.*
-FROM
-  another_table
-</code></pre>
-</div>
-</div>
 <p>In PRQL <code>table</code>s are far less common than CTEs are in SQL, since a linear
 series of CTEs can be represented with a single pipeline.</p>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
-<p>Currently it’s not yet possible to have an
+<p>Currently it's not yet possible to have an
 <a href="./../language-features/s-strings.html">s-string</a> as a whole table. See
 <a href="https://github.com/prql/prql/issues/376">#376</a> for more details.</p>
 <!-- TODO: find an example that we can't currently represent with PRQL -->

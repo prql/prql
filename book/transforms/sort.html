@@ -156,62 +156,15 @@
 <li>When using prefixes, make sure to wrap columns in a list. Otherwise, <code>sort -column</code> is interpreted as subtraction between <code>sort</code> and <code>column</code>.</li>
 </ul>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 sort age
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-ORDER BY
-  age
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 sort [-age]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-ORDER BY
-  age DESC
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 sort [age, -tenure, +salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-ORDER BY
-  age,
-  tenure DESC,
-  salary
-</code></pre>
-</div>
-</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <p>Currently <code>sort</code> does not accept expressions:</p>
 <pre><code class="language-prql_no_test">from employees

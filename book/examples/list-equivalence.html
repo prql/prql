@@ -141,81 +141,25 @@
                 <div id="content" class="content">
                     <main>
                         <h2 id="single-item-is-coerced-into-a-list"><a class="header" href="#single-item-is-coerced-into-a-list">Single item is coerced into a list</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select salary
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  salary
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p>Same as above but with <code>salary</code> in a list:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select [salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  salary
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <h2 id="multiple-items"><a class="header" href="#multiple-items">Multiple items</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive [
   gross_salary = salary + payroll_tax,
   gross_cost = gross_salary + benefits_cost
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary,
-  salary + payroll_tax + benefits_cost AS gross_cost
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p>Same as above but split into two lines:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive gross_salary = salary + payroll_tax
 derive gross_cost = gross_salary + benefits_cost
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary,
-  salary + payroll_tax + benefits_cost AS gross_cost
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 
                     </main>
 

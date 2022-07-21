@@ -145,59 +145,19 @@
 <pre><code class="language-prql_no_test">derive [{new_name} = {expression}]
 </code></pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive gross_salary = salary + payroll_tax
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive [
   gross_salary = salary + payroll_tax,
   gross_cost = gross_salary + benefits_cost
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary,
-  salary + payroll_tax + benefits_cost AS gross_cost
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p><code>derive</code> generally computes a column from existing columns, but can also take a
 literal in which case it can begin a pipeline without a <code>from</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">derive x = 5
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  5 AS x
-</code></pre>
-</div>
-</div>
 
                     </main>
 

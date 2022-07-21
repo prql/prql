@@ -143,68 +143,22 @@
                         <h1 id="pipelines"><a class="header" href="#pipelines">Pipelines</a></h1>
 <h2 id="the-simplest-pipeline"><a class="header" href="#the-simplest-pipeline">The simplest pipeline</a></h2>
 <p>The simplest pipeline is just:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <h2 id="adding-transformations"><a class="header" href="#adding-transformations">Adding transformations</a></h2>
 <p>We can add additional lines, each one transforms the result:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive gross_salary = (salary + payroll_tax)
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<p>…and so on:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
+<p>...and so on:</p>
 <pre><code class="language-prql">from employees
 derive gross_salary = (salary + payroll_tax)
 sort gross_salary
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  salary + payroll_tax AS gross_salary
-FROM
-  employees
-ORDER BY
-  gross_salary
-</code></pre>
-</div>
-</div>
 <h2 id="compiling-to-sql"><a class="header" href="#compiling-to-sql">Compiling to SQL</a></h2>
 <p>When compiling to SQL, the PRQL compiler will try to represent as many
 transforms as possible with a single <code>SELECT</code> statement. When necessary it will
-“overflow” using CTEs (common table expressions):</p>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
+&quot;overflow&quot; using CTEs (common table expressions):</p>
 <pre><code class="language-prql">from e = employees
 derive gross_salary = (salary + payroll_tax)
 sort gross_salary
@@ -212,30 +166,6 @@ take 10
 join d = department [dept_no]
 select [e.name, gross_salary, d.name]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    e.*,
-    salary + payroll_tax AS gross_salary
-  FROM
-    employees AS e
-  ORDER BY
-    gross_salary
-  LIMIT
-    10
-)
-SELECT
-  table_0.name,
-  table_0.gross_salary,
-  d.name
-FROM
-  table_0
-  JOIN department AS d USING(dept_no)
-</code></pre>
-</div>
-</div>
 <h2 id="see-also"><a class="header" href="#see-also">See also</a></h2>
 <p><a href="./syntax.html">Syntax</a></p>
 

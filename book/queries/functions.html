@@ -145,7 +145,7 @@
 TODOs:
 - Examples are a bit artificial — the interp is just "divide by 100" in one case!  -->
 <p>Functions are a fundamental abstraction in PRQL — they allow us to run code in
-many places that we’ve written once. This reduces the number of errors in our
+many places that we've written once. This reduces the number of errors in our
 code, makes our code more readable, and simplifies making changes.</p>
 <p>Functions have two types of parameters:</p>
 <ol>
@@ -154,32 +154,15 @@ code, makes our code more readable, and simplifies making changes.</p>
 default value.</li>
 </ol>
 <p>So this function is named <code>celsius_of_fahrenheit</code> and has one parameter <code>temp</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt; (temp - 32) * 3
 
 from cities
 derive temp_c = (celsius_of_fahrenheit temp_f)
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  cities.*,
-  temp_f - 32 * 3 AS temp_c
-FROM
-  cities
-</code></pre>
-</div>
-</div>
 <p>This function is named <code>interp</code>, and has two positional parameters named
 <code>higher</code> and <code>x</code>, and one named parameter named <code>lower</code> which takes a default
 argument of <code>0</code>. It calculates the proportion of the distance that <code>x</code> is
 between <code>lower</code> and <code>higher</code>.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">func interp lower:0 higher x -&gt; (x - lower) / (higher - lower)
 
 from students
@@ -188,27 +171,12 @@ derive [
   sat_proportion_2 = (interp lower:0 1600 sat_score),
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  students.*,
-  sat_score - 0 / 1600 - 0 AS sat_proportion_1,
-  sat_score - 0 / 1600 - 0 AS sat_proportion_2
-FROM
-  students
-</code></pre>
-</div>
-</div>
 <h2 id="piping"><a class="header" href="#piping">Piping</a></h2>
-<p>Consistent with the principles of PRQL, it’s possible to pipe values into
+<p>Consistent with the principles of PRQL, it's possible to pipe values into
 functions, which makes composing many functions more readable. When piping a
 value into a function, the value is passed as an argument to the final
-positional parameter of the function. Here’s the same result as the examples
+positional parameter of the function. Here's the same result as the examples
 above with an alternative construction:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">func interp lower:0 higher x -&gt; (x - lower) / (higher - lower)
 
 from students
@@ -217,66 +185,26 @@ derive [
   sat_proportion_2 = (sat_score | interp lower:0 1600),
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  students.*,
-  sat_score - 0 / 1600 - 0 AS sat_proportion_1,
-  sat_score - 0 / 1600 - 0 AS sat_proportion_2
-FROM
-  students
-</code></pre>
-</div>
-</div>
 <p>and</p>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt; (temp - 32) * 3
 
 from cities
 derive temp_c = (temp_f | celsius_of_fahrenheit)
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  cities.*,
-  temp_f - 32 * 3 AS temp_c
-FROM
-  cities
-</code></pre>
-</div>
-</div>
 <p>We can combine a chain of functions, which makes logic more readable:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
 <pre><code class="language-prql">func celsius_of_fahrenheit temp -&gt; (temp - 32) * 3
 func interp lower:0 higher x -&gt; (x - lower) / (higher - lower)
 
 from kettles
 derive boiling_proportion = (temp_c | celsius_of_fahrenheit | interp 100)
 </code></pre>
-</div>
-<div>
-<h4 id="sql-4"><a class="header" href="#sql-4">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  kettles.*,
-  temp_c - 32 * 3 - 0 / 100 - 0 AS boiling_proportion
-FROM
-  kettles
-</code></pre>
-</div>
-</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <h3 id="late-binding"><a class="header" href="#late-binding">Late binding</a></h3>
-<p>Currently, functions require a binding to variables in scope; they can’t
+<p>Currently, functions require a binding to variables in scope; they can't
 late-bind to column names; so for example:</p>
 <pre><code class="language-prql_no_test">func return price -&gt; (price - dividend) / price_yesterday
 </code></pre>
-<p>…isn’t yet a valid function, and instead would needs to be:</p>
+<p>...isn't yet a valid function, and instead would needs to be:</p>
 <pre><code class="language-prql_no_test">func return price dividend price_yesterday -&gt;  (price - dividend) / (price_yesterday)
 </code></pre>
 <p>(which makes functions in this case not useful)</p>

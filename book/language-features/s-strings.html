@@ -141,47 +141,20 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="s-strings"><a class="header" href="#s-strings">S-Strings</a></h1>
-<p>An s-string inserts SQL directly, as an escape hatch when there’s something that PRQL
-doesn’t yet implement. For example, there’s no <code>version()</code> function in SQL that
+<p>An s-string inserts SQL directly, as an escape hatch when there's something that PRQL
+doesn't yet implement. For example, there's no <code>version()</code> function in SQL that
 returns the Postgres version, so if we want to use that, we use an s-string:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">derive db_version = s&quot;version()&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  version() AS db_version
-</code></pre>
-</div>
-</div>
-<p>We can embed columns in an s-string using braces. For example, PRQL’s standard
+<p>We can embed columns in an s-string using braces. For example, PRQL's standard
 library defines the <code>average</code> function as:</p>
 <pre><code class="language-prql_no_test">func average column -&gt; s&quot;AVG({column})&quot;
 </code></pre>
 <p>So this compiles using the function:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 aggregate [average salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  AVG(salary)
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<p>Here’s an example of a more involved use of an s-string:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
+<p>Here's an example of a more involved use of an s-string:</p>
 <pre><code class="language-prql">from de=dept_emp
 join s=salaries side:left [
   (s.emp_no == de.emp_no),
@@ -190,49 +163,20 @@ join s=salaries side:left [
   ({de.from_date}, {de.to_date})&quot;&quot;&quot;
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  de.*,
-  s.*
-FROM
-  dept_emp AS de
-  LEFT JOIN salaries AS s ON s.emp_no = de.emp_no
-  AND (s.from_date, s.to_date) OVERLAPS (de.from_date, de.to_date)
-</code></pre>
-</div>
-</div>
-<p>For those who have used python, s-strings are similar to python’s f-strings, but
+<p>For those who have used python, s-strings are similar to python's f-strings, but
 the result is SQL, rather than a string literal — a python f-string of
 <code>f&quot;average{col}&quot;</code> where <code>col=&quot;salary&quot;</code> would produce <code>&quot;average(salary)&quot;</code>, with
 the quotes. <code>s&quot;average{col}&quot;</code> produces <code>average(salary)</code>, without quotes.</p>
 <p>s-strings in user code are intended as an escape-hatch for an unimplemented
-feature. If we often need s-strings to express something, that’s a sign we
-should implement it in PRQL or PRQL’s stdlib.</p>
+feature. If we often need s-strings to express something, that's a sign we
+should implement it in PRQL or PRQL's stdlib.</p>
 <h2 id="backticks"><a class="header" href="#backticks">Backticks</a></h2>
 <p>PRQL will also pass through identifiers surrounded by backticks (including the
 backticks). Some databases — e.g. BigQuery — use this to allow identifiers which
-aren’t otherwise valid; such as those containing a hyphen.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
+aren't otherwise valid; such as those containing a hyphen.</p>
 <pre><code class="language-prql">from `project-foo.dataset.table`
 join `project-bar.dataset.table` [col_bax]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  `project-foo.dataset.table`.*,
-  `project-bar.dataset.table`.*,
-  col_bax
-FROM
-  `project-foo.dataset.table`
-  JOIN `project-bar.dataset.table` USING(col_bax)
-</code></pre>
-</div>
-</div>
 
                     </main>
 

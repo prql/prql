@@ -140,10 +140,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
-<pre><code class="language-prql">table newest_employees = (
+                        <pre><code class="language-prql">table newest_employees = (
   from employees
   sort tenure
   take 50
@@ -160,37 +157,6 @@ from newest_employees
 join average_salaries [country]
 select [name, salary, average_country_salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">WITH newest_employees AS (
-  SELECT
-    employees.*
-  FROM
-    employees
-  ORDER BY
-    tenure
-  LIMIT
-    50
-), average_salaries AS (
-  SELECT
-    country,
-    AVG(salary) AS average_country_salary
-  FROM
-    salaries
-  GROUP BY
-    country
-)
-SELECT
-  name,
-  average_salaries.salary,
-  average_salaries.average_country_salary
-FROM
-  newest_employees
-  JOIN average_salaries USING(country)
-</code></pre>
-</div>
-</div>
 
                     </main>
 

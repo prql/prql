@@ -143,51 +143,16 @@
                         <h1 id="f-strings"><a class="header" href="#f-strings">F-Strings</a></h1>
 <p>f-strings are a readable approach to building new strings from existing strings.
 Currently PRQL supports this for concatenating strings:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select full_name = f&quot;{first_name} {last_name}&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  CONCAT(first_name, ' ', last_name) AS full_name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p>This can be much easier to read for longer strings, relative to the SQL approach:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from web
 select url = f&quot;http{tls}://www.{domain}.{tld}/{page}&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  CONCAT(
-    'http',
-    tls,
-    '://www.',
-    domain,
-    '.',
-    tld,
-    '/',
-    page
-  ) AS url
-FROM
-  web
-</code></pre>
-</div>
-</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <p>In the future, f-strings may incorporate string formatting such as datetimes,
-numbers, and padding. If there’s a feature that would be helpful, please <a href="https://github.com/prql/prql/issues/new/">post
+numbers, and padding. If there's a feature that would be helpful, please <a href="https://github.com/prql/prql/issues/new/">post
 an issue</a>.</p>
 
                     </main>

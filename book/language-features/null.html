@@ -157,28 +157,12 @@ unknown values. As a result, in SQL:</p>
 <li><code>null != null</code> evaluates to <code>false</code>,</li>
 <li>distinct column cannot contain multiple <code>null</code> values.</li>
 </ul>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 filter first_name == null
 filter null != last_name
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-WHERE
-  first_name IS NULL
-  AND last_name IS NOT NULL
-</code></pre>
-</div>
-</div>
-<p>Note that PRQL doesn’t change how <code>NULL</code> is compared between columns, for
-example in joins. (PRQL compiles to SQL and so can’t change the behavior of the
+<p>Note that PRQL doesn't change how <code>NULL</code> is compared between columns, for
+example in joins. (PRQL compiles to SQL and so can't change the behavior of the
 database).</p>
 <p>For more context or to provide feedback check out the discussion on
 <a href="https://github.com/prql/prql/issues/99">issue #99</a>.</p>

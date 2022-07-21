@@ -141,14 +141,14 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="prefect"><a class="header" href="#prefect">Prefect</a></h1>
-<p>Because Prefect is in native python, it’s extremely easy to integrate with PRQL.</p>
+<p>Because Prefect is in native python, it's extremely easy to integrate with PRQL.</p>
 <p>With a Postgres Task, replace:</p>
 <pre><code class="language-python">PostgresExecute.run(..., query=sql)
 </code></pre>
-<p>…with…</p>
+<p>...with...</p>
 <pre><code class="language-python">PostgresExecute.run(..., query=pyprql.to_sql(prql))
 </code></pre>
-<p>We’re big fans of Prefect, and if there is anything that would make the
+<p>We're big fans of Prefect, and if there is anything that would make the
 integration easier, please open an issue.</p>
 
                     </main>

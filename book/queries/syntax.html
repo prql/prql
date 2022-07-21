@@ -162,51 +162,19 @@
 <h2 id="pipes"><a class="header" href="#pipes">Pipes</a></h2>
 <p>Pipes — the connection between <a href="../transforms.html">transforms</a> that make up a
 pipeline — can be either line breaks or a pipe character (<code>|</code>).</p>
-<p>In almost all situations, line-breaks pipe the result of a line’s transform into the transform on
+<p>In almost all situations, line-breaks pipe the result of a line's transform into the transform on
 the following line. For example, the <code>filter</code> transform operates on the result
 of <code>from employees</code> (which is just the <code>employees</code> table), and the <code>select</code> transform operates on
 the result of the <code>filter</code> transform.</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 filter department == &quot;Product&quot;
 select [first_name, last_name]
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name,
-  last_name
-FROM
-  employees
-WHERE
-  department = 'Product'
-</code></pre>
-</div>
-</div>
-<p>In the place of a line-break, it’s also possible to use the <code>|</code> character to
+<p>In the place of a line-break, it's also possible to use the <code>|</code> character to
 pipe results, such that this is equivalent:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees | filter department == &quot;Product&quot; | select [first_name, last_name]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name,
-  last_name
-FROM
-  employees
-WHERE
-  department = 'Product'
-</code></pre>
-</div>
-</div>
-<p>A line-break doesn’t create a pipeline in a couple of cases:</p>
+<p>A line-break doesn't create a pipeline in a couple of cases:</p>
 <ul>
 <li>within a list (e.g. the <code>derive</code> examples below),</li>
 <li>when the following line is a new statement, which starts with a keyword of
@@ -215,9 +183,6 @@ WHERE
 <h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
 <p>Lists are represented with <code>[]</code>, and can span multiple lines. A final trailing
 comma is optional.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">derive [x = 1, y = 2]
 derive [
   a = x,
@@ -228,62 +193,20 @@ derive [
   d = b,
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  1 AS x,
-  2 AS y,
-  1 AS a,
-  2 AS b,
-  1 AS c,
-  2 AS d
-</code></pre>
-</div>
-</div>
 <p>Most transforms can take either a list or a single item, so these are
 equivalent:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select [first_name]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select first_name
 </code></pre>
-</div>
-<div>
-<h4 id="sql-4"><a class="header" href="#sql-4">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <h2 id="parentheses"><a class="header" href="#parentheses">Parentheses</a></h2>
 <p>Parentheses — <code>()</code> — are used to give precedence to inner expressions, as is the
 case in almost all languages / math.</p>
 <p>In particular, parentheses are used to nest pipelines for transforms such as
 <code>group</code> and <code>window</code>, which take a pipeline. Here, the <code>aggregate</code> pipeline is
 applied to each group of unique <code>title</code> and <code>country</code> values.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-5"><a class="header" href="#prql-5">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group [title, country] (
   aggregate [
@@ -292,41 +215,12 @@ group [title, country] (
   ]
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql-5"><a class="header" href="#sql-5">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  COUNT(*) AS ct
-FROM
-  employees
-GROUP BY
-  title,
-  country
-</code></pre>
-</div>
-</div>
 <h2 id="comments"><a class="header" href="#comments">Comments</a></h2>
 <p>Comments are represented by <code>#</code>. Currently only single line comments exist.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-6"><a class="header" href="#prql-6">PRQL</a></h4>
 <pre><code class="language-prql">from employees  # Comment 1
 # Comment 2
 aggregate [average salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-6"><a class="header" href="#sql-6">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  AVG(salary)
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 
                     </main>
 

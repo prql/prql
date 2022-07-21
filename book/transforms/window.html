@@ -161,7 +161,7 @@ extend until the edge of the table or group.</p>
 <p>For ease of use, there are two flags that override <code>rows</code> or <code>range</code>:</p>
 <ul>
 <li><code>expanding:true</code> is an alias for <code>rows:..0</code>. A sum using this window is also
-known as “cumulative sum”.</li>
+known as &quot;cumulative sum&quot;.</li>
 <li><code>rolling:n</code> is an alias for <code>row:(-n+1)..0</code>, where <code>n</code> is an integer. This
 will include <code>n</code> last values, including current row. An average using this
 window is also knows as a Simple Moving Average.</li>
@@ -179,9 +179,6 @@ window is also knows as a Simple Moving Average.</li>
 </tbody></table>
 </div>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group employee_id (
   sort month
@@ -190,25 +187,6 @@ group employee_id (
   )
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  SUM(paycheck) OVER (
-    PARTITION BY employee_id
-    ORDER BY
-      month ROWS BETWEEN 11 PRECEDING
-      AND CURRENT ROW
-  ) AS trail_12_m_comp
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 sort day
 window rows:-3..3 (
@@ -221,27 +199,6 @@ group [order_month] (
   )
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  orders.*,
-  AVG(value) OVER (
-    ORDER BY
-      day ROWS BETWEEN 3 PRECEDING
-      AND 3 FOLLOWING
-  ) AS centered_weekly_average,
-  SUM(value) OVER (
-    PARTITION BY order_month
-    ORDER BY
-      day ROWS BETWEEN UNBOUNDED PRECEDING
-      AND CURRENT ROW
-  ) AS monthly_running_total
-FROM
-  orders
-</code></pre>
-</div>
-</div>
 
                     </main>
 

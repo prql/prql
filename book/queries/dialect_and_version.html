@@ -145,54 +145,22 @@
 <p>PRQL allows specifying a dialect at the top of the query, which allows PRQL to
 compile to a database-specific SQL flavor.</p>
 <h3 id="examples"><a class="header" href="#examples">Examples</a></h3>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">prql dialect:postgres
 
 from employees
 sort age
 take 10
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-ORDER BY
-  age
-LIMIT
-  10
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">prql dialect:mssql
 
 from employees
 sort age
 take 10
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  TOP (10) employees.*
-FROM
-  employees
-ORDER BY
-  age
-</code></pre>
-</div>
-</div>
 <h3 id="supported-dialects"><a class="header" href="#supported-dialects">Supported dialects</a></h3>
 <blockquote>
 <p>Note that dialect support is <em>very</em> early — most differences are not
-implemented, and most dialects’ implementations are identical to <code>generic</code>’s.
+implemented, and most dialects' implementations are identical to <code>generic</code>'s.
 Contributions are very welcome.</p>
 </blockquote>
 <ul>
@@ -209,23 +177,10 @@ Contributions are very welcome.</p>
 </ul>
 <h2 id="version"><a class="header" href="#version">Version</a></h2>
 <p>PRQL allows specifying a version of the language in the PRQL header, like:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">prql version:1
 
 from employees
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p>When the functionality is implemented, it will allow the language to evolve
 without breaking existing queries.</p>
 

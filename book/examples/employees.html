@@ -162,9 +162,6 @@ $ cargo run compile examples/employees/average-title-salary.prql | psql -U postg
 <li>group by department and title, aggregating average salary</li>
 <li>join with department to get department name</li>
 </ul>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from salaries
 group [emp_no] (
   aggregate [emp_salary = average salary]
@@ -177,48 +174,10 @@ group [dept_emp.dept_no, t.title] (
 join departments [dept_no]
 select [dept_name, title, avg_salary]
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    emp_no,
-    AVG(salary) AS emp_salary
-  FROM
-    salaries
-  GROUP BY
-    emp_no
-),
-table_1 AS (
-  SELECT
-    dept_emp.dept_no,
-    t.title,
-    AVG(table_0.emp_salary) AS avg_salary
-  FROM
-    table_0
-    JOIN titles AS t USING(emp_no)
-    LEFT JOIN dept_emp USING(emp_no)
-  GROUP BY
-    dept_emp.dept_no,
-    t.title
-)
-SELECT
-  departments.dept_name,
-  table_1.title,
-  table_1.avg_salary
-FROM
-  table_1
-  JOIN departments USING(dept_no)
-</code></pre>
-</div>
-</div>
 <h2 id="task-2"><a class="header" href="#task-2">Task 2</a></h2>
 <blockquote>
 <p>Estimate distribution of salaries and gender for each department departments.</p>
 </blockquote>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 join salaries [emp_no]
 group [emp_no, gender] (
@@ -236,52 +195,10 @@ group [de.dept_no, gender] (
 join departments [dept_no]
 select [dept_name, gender, salary_avg, salary_sd]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    emp_no,
-    gender,
-    AVG(salary) AS emp_salary
-  FROM
-    employees
-    JOIN salaries USING(emp_no)
-  GROUP BY
-    emp_no,
-    gender
-),
-table_1 AS (
-  SELECT
-    de.dept_no,
-    de.gender,
-    AVG(table_0.emp_salary) AS salary_avg,
-    STDDEV(table_0.emp_salary) AS salary_sd
-  FROM
-    table_0
-    LEFT JOIN dept_emp AS de USING(emp_no)
-  GROUP BY
-    de.dept_no,
-    de.gender
-)
-SELECT
-  departments.dept_name,
-  table_1.gender,
-  table_1.salary_avg,
-  table_1.salary_sd
-FROM
-  table_1
-  JOIN departments USING(dept_no)
-</code></pre>
-</div>
-</div>
 <h2 id="task-3"><a class="header" href="#task-3">Task 3</a></h2>
 <blockquote>
 <p>Estimate distribution of salaries and gender for each manager.</p>
 </blockquote>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 join salaries [emp_no]
 group [emp_no, gender] (
@@ -304,55 +221,10 @@ join managers=employees [emp_no]
 derive mng_name = s&quot;managers.first_name || ' ' || managers.last_name&quot;
 select [mng_name, managers.gender, salary_avg, salary_sd]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    emp_no,
-    gender,
-    AVG(salary) AS emp_salary
-  FROM
-    employees
-    JOIN salaries USING(emp_no)
-  GROUP BY
-    emp_no,
-    gender
-),
-table_1 AS (
-  SELECT
-    dm.emp_no,
-    gender,
-    AVG(table_0.emp_salary) AS salary_avg,
-    STDDEV(table_0.emp_salary) AS salary_sd,
-    dm.emp_no AS mng_no
-  FROM
-    table_0
-    JOIN dept_emp AS de USING(emp_no)
-    JOIN dept_manager AS dm ON dm.dept_no = de.dept_no
-    AND (de.from_date, de.to_date) OVERLAPS (dm.from_date, dm.to_date)
-  GROUP BY
-    dm.emp_no,
-    gender
-)
-SELECT
-  managers.first_name || ' ' || managers.last_name AS mng_name,
-  managers.gender,
-  table_1.salary_avg,
-  table_1.salary_sd
-FROM
-  table_1
-  JOIN employees AS managers USING(emp_no)
-</code></pre>
-</div>
-</div>
 <h2 id="task-4"><a class="header" href="#task-4">Task 4</a></h2>
 <blockquote>
 <p>Find distributions of titles, salaries and genders for each department.</p>
 </blockquote>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from de=dept_emp
 join s=salaries side:left [
   (s.emp_no == de.emp_no),
@@ -365,34 +237,6 @@ join employees [emp_no]
 join titles [emp_no]
 select [dept_no, salary, employees.gender, titles.title]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    de.emp_no,
-    de.dept_no,
-    AVG(s.salary) AS salary
-  FROM
-    dept_emp AS de
-    LEFT JOIN salaries AS s ON s.emp_no = de.emp_no
-    AND (s.from_date, s.to_date) OVERLAPS (de.from_date, de.to_date)
-  GROUP BY
-    de.emp_no,
-    de.dept_no
-)
-SELECT
-  table_0.dept_no,
-  table_0.salary,
-  employees.gender,
-  titles.title
-FROM
-  table_0
-  JOIN employees USING(emp_no)
-  JOIN titles USING(emp_no)
-</code></pre>
-</div>
-</div>
 
                     </main>
 

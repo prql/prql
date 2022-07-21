@@ -147,46 +147,13 @@
 <p>See <a href="../language-features/ranges.html">Ranges</a> for more details on how ranges
 work.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 take 10
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-LIMIT
-  10
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 sort [-value, date]
 take 101..110
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  orders.*
-FROM
-  orders
-ORDER BY
-  value DESC,
-  date
-LIMIT
-  10 OFFSET 100
-</code></pre>
-</div>
-</div>
 
                     </main>
 

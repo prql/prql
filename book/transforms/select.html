@@ -145,75 +145,21 @@
 <pre><code class="language-prql_no_test">select [{assign_expression}]
 </code></pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select first_name
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select [first_name, last_name]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  first_name,
-  last_name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select name = f&quot;{first_name} {last_name}&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  CONCAT(first_name, ' ', last_name) AS name
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select [
   name = f&quot;{first_name} {last_name}&quot;,
   age_eoy = dob - @2022-12-31,
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  CONCAT(first_name, ' ', last_name) AS name,
-  dob - DATE '2022-12-31' AS age_eoy
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 
                     </main>
 

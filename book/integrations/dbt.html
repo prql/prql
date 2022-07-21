@@ -145,10 +145,10 @@
 <p>Original docs at <a href="https://github.com/prql/dbt-prql">https://github.com/prql/dbt-prql</a></p>
 </blockquote>
 <p><a href="https://github.com/prql/dbt-prql">dbt-prql</a> allows writing PRQL in dbt models.
-This combines the benefits of PRQL’s power &amp; simplicity <em>within</em> queries, with
-dbt’s version control, lineage &amp; testing <em>across</em> queries.</p>
+This combines the benefits of PRQL's power &amp; simplicity <em>within</em> queries, with
+dbt's version control, lineage &amp; testing <em>across</em> queries.</p>
 <p>Once <code>dbt-prql</code> in installed, dbt commands compile PRQL between <code>{% prql %}</code> &amp;
-<code>{% endprql %}</code> jinja tags to SQL as part of dbt’s compilation. No additional
+<code>{% endprql %}</code> jinja tags to SQL as part of dbt's compilation. No additional
 config is required.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
 <h3 id="simple-example"><a class="header" href="#simple-example">Simple example</a></h3>
@@ -157,7 +157,7 @@ from employees
 filter (age | in 20..30)
 {% endprql %}
 </code></pre>
-<p>…would appear to dbt as:</p>
+<p>...would appear to dbt as:</p>
 <pre><code class="language-sql">SELECT
   employees.*
 FROM
@@ -176,7 +176,7 @@ group name (
 )
 {% endprql %}
 </code></pre>
-<p>…would appear to dbt as:</p>
+<p>...would appear to dbt as:</p>
 <pre><code class="language-sql">SELECT
   name,
   {{ source('salesforce', 'in_process') }}.probability * {{ source('salesforce', 'in_process') }}.value AS expected_sales
@@ -186,13 +186,13 @@ FROM
 GROUP BY
   name
 </code></pre>
-<p>…and then dbt will compile the <code>source</code> and <code>ref</code>s to a full SQL query.</p>
+<p>...and then dbt will compile the <code>source</code> and <code>ref</code>s to a full SQL query.</p>
 <h3 id="replacing-macros"><a class="header" href="#replacing-macros">Replacing macros</a></h3>
-<p>dbt’s use of macros has saved many of us many lines of code, and even saved some
+<p>dbt's use of macros has saved many of us many lines of code, and even saved some
 people some time. But imperatively programming text generation with code like
-<code>if not loop.last</code> is not our highest calling. It’s the “necessary” part rather
+<code>if not loop.last</code> is not our highest calling. It's the &quot;necessary&quot; part rather
 than beautiful part of dbt.</p>
-<p>Here’s the canonical example of macros in the <a href="https://docs.getdbt.com/tutorial/learning-more/using-jinja">dbt
+<p>Here's the canonical example of macros in the <a href="https://docs.getdbt.com/tutorial/learning-more/using-jinja">dbt
 documentation</a>:</p>
 <pre><code class="language-sql">{%- set payment_methods = [&quot;bank_transfer&quot;, &quot;credit_card&quot;, &quot;gift_card&quot;] -%}
 
@@ -205,7 +205,7 @@ sum(case when payment_method = '{{payment_method}}' then amount end) as {{paymen
 from {{ ref('raw_payments') }}
 group by 1
 </code></pre>
-<p>Here’s that model using PRQL<sup class="footnote-reference"><a href="#1">1</a></sup>, including the prql jinja tags.</p>
+<p>Here's that model using PRQL<sup class="footnote-reference"><a href="#1">1</a></sup>, including the prql jinja tags.</p>
 <pre><code class="language-prql_no_test">{% prql %}
 func filter_amount method -&gt; s&quot;sum(case when payment_method = '{method}' then amount end) as {method}_amount&quot;
 
@@ -220,7 +220,7 @@ group order_id (
 {% endprql %}
 </code></pre>
 <p>As well the query being simpler in its final form, writing in PRQL also gives us
-live feedback around any errors, on every keystroke. Though there’s much more to
+live feedback around any errors, on every keystroke. Though there's much more to
 come, check out the current version on <a href="https://prql-lang.org/playground/">PRQL
 Playground</a>.</p>
 <h2 id="what-it-does"><a class="header" href="#what-it-does">What it does</a></h2>
@@ -228,19 +228,19 @@ Playground</a>.</p>
 <ul>
 <li>Any text in a dbt model between <code>{% prql %}</code> and <code>{% endprql %}</code> tags is
 compiled from PRQL to SQL before being passed to dbt.</li>
-<li>The PRQL complier passes text that’s containing <code>{{</code> &amp; <code>}}</code> through to dbt
+<li>The PRQL complier passes text that's containing <code>{{</code> &amp; <code>}}</code> through to dbt
 without modification, which allows us to embed jinja expressions in PRQL.
 (This was added to PRQL specifically for this use-case.)</li>
 <li>dbt will then compile the resulting model into its final form of raw SQL, and
 dispatch it to the database, as per usual.</li>
 </ul>
-<p>There’s no config needed in the dbt project; this works automatically on any dbt
+<p>There's no config needed in the dbt project; this works automatically on any dbt
 command (e.g. <code>dbt run</code>) assuming <code>dbt-prql</code> is installed.</p>
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
 <pre><code class="language-sh">pip install dbt-prql
 </code></pre>
 <h2 id="current-state"><a class="header" href="#current-state">Current state</a></h2>
-<p>Currently this is new, but fairly feature-complete. It’s enthusiastically
+<p>Currently this is new, but fairly feature-complete. It's enthusiastically
 supported — if there are any problems, please open an issue.</p>
 
                     </main>

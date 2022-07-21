@@ -144,55 +144,19 @@
 <p>PRQL has a concise range syntax <code>start..end</code>.</p>
 <p>This can be used in filters with the <code>in</code> function, with any type of literal,
 including dates:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from events
 filter (date | in @1776-07-04..@1787-09-17)
 filter (magnitude | in 50..100)
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  events.*
-FROM
-  events
-WHERE
-  date BETWEEN DATE '1776-07-04'
-  AND DATE '1787-09-17'
-  AND magnitude BETWEEN 50
-  AND 100
-</code></pre>
-</div>
-</div>
 <p>Like in SQL, ranges are inclusive.</p>
 <p>As discussed in the <a href="../transforms/take.html">take</a> docs, ranges can also be used
 in <code>take</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 sort [-value, date]
 take 101..110
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  orders.*
-FROM
-  orders
-ORDER BY
-  value DESC,
-  date
-LIMIT
-  10 OFFSET 100
-</code></pre>
-</div>
-</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
-<p>We’d like to use this for more like whether an object is in an array or list literal.</p>
+<p>We'd like to use this for more like whether an object is in an array or list literal.</p>
 
                     </main>
 

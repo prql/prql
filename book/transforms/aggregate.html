@@ -150,29 +150,12 @@
 <pre><code class="language-prql_no_test">aggregate [{expression or assign operations}]
 </code></pre>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 aggregate [
   average salary,
   ct = count
 ]
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  AVG(salary),
-  COUNT(*) AS ct
-FROM
-  employees
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group [title, country] (
   aggregate [
@@ -181,22 +164,6 @@ group [title, country] (
   ]
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  COUNT(*) AS ct
-FROM
-  employees
-GROUP BY
-  title,
-  country
-</code></pre>
-</div>
-</div>
 
                     </main>
 

@@ -141,51 +141,22 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="distinct"><a class="header" href="#distinct">Distinct</a></h1>
-<p>PRQL doesn’t have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
+<p>PRQL doesn't have a specific <code>distinct</code> keyword. Instead, use <code>group</code> and <code>take 1</code>:</p>
 <pre><code class="language-prql">from employees
 select department
 group department (
   take 1
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  DISTINCT department
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <p>This also works without a linebreak:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 select department
 group department (take 1)
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  DISTINCT department
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <h2 id="selecting-from-each-group"><a class="header" href="#selecting-from-each-group">Selecting from each group</a></h2>
 <p>We are be able to <a href="https://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group">select a single row from each
 group</a>
 by combining <code>group</code> and <code>sort</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql"># youngest employee from each department
 from employees
 group department (
@@ -193,29 +164,6 @@ group department (
   take 1
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    employees.*,
-    ROW_NUMBER() OVER (
-      PARTITION BY department
-      ORDER BY
-        age
-    ) AS _rn
-  FROM
-    employees
-)
-SELECT
-  table_0.*
-FROM
-  table_0
-WHERE
-  _rn &lt;= 1
-</code></pre>
-</div>
-</div>
 <h2 id="roadmap"><a class="header" href="#roadmap">Roadmap</a></h2>
 <p>When using Postgres dialect, we are planning to compile:</p>
 <pre><code class="language-prql_no_test"># youngest employee from each department
@@ -225,7 +173,7 @@ group department (
   take 1
 )
 </code></pre>
-<p>… to …</p>
+<p>... to ...</p>
 <pre><code class="language-sql">SELECT DISTINCT ON (department) *
 FROM employees
 ORDER BY department, age

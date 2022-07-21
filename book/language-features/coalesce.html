@@ -143,23 +143,9 @@
                         <h1 id="coalesce"><a class="header" href="#coalesce">Coalesce</a></h1>
 <p>We can coalesce values with an <code>??</code> operator. Coalescing takes either the first
 value or, if that value is null, the second value.</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 derive amount ?? 0
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  orders.*,
-  COALESCE(amount, 0)
-FROM
-  orders
-</code></pre>
-</div>
-</div>
 
                     </main>
 

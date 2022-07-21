@@ -142,8 +142,8 @@
                     <main>
                         <h1 id="dates--times"><a class="header" href="#dates--times">Dates &amp; Times</a></h1>
 <p>PRQL uses <code>@</code> followed by a string to represent dates &amp; times. This is less
-verbose than SQL’s approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
-explicit than SQL’s implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
+verbose than SQL's approach of <code>TIMESTAMP '2004-10-19 10:23:54'</code> and more
+explicit than SQL's implicit option of just using a string <code>'2004-10-19 10:23:54'</code>.</p>
 <div id="admonition-note" class="admonition note">
 <div class="admonition-title">
 <p>Note</p>
@@ -152,70 +152,31 @@ explicit than SQL’s implicit option of just using a string <code>'2004-10-19 1
 <div>
 <p>Currently PRQL passes strings which can be compiled straight through to the
 database, and so many compatible formats string may work, but we may refine this
-in the future to aid in compatibility across databases. We’ll always support the
+in the future to aid in compatibility across databases. We'll always support the
 canonical <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO8601</a> format described below.</p>
 </div>
 </div>
 <h2 id="dates"><a class="header" href="#dates">Dates</a></h2>
 <p>Dates are represented by <code>@{yyyy-mm-dd}</code> — a <code>@</code> followed by the
 date format.</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 derive age_at_year_end = (@2022-12-31 - dob)
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*,
-  DATE '2022-12-31' - dob AS age_at_year_end
-FROM
-  employees
-</code></pre>
-</div>
-</div>
 <h2 id="times"><a class="header" href="#times">Times</a></h2>
 <p>Times are represented by <code>@{HH:mm:ss.SSS±Z}</code> with any parts not supplied being
 rounded to zero, including the timezone, which is represented by <code>+HH:mm</code>,
 <code>-HH:mm</code> or <code>Z</code>. This is consistent with the ISO8601 time format.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from orders
 derive should_have_shipped_today = (order_time &lt; @08:30)
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  orders.*,
-  order_time &lt; TIME '08:30' AS should_have_shipped_today
-FROM
-  orders
-</code></pre>
-</div>
-</div>
 <h2 id="timestamps"><a class="header" href="#timestamps">Timestamps</a></h2>
 <p>Timestamps are represented by <code>@{yyyy-mm-ddTHH:mm:ss.SSS±Z}</code> /
 <code>@{date}T{time}</code>, with any time parts not supplied being rounded to zero,
 including the timezone, which is represented by <code>+HH:mm</code>, <code>-HH:mm</code> or <code>Z</code>. This
 is <code>@</code> followed by the ISO8601 datetime format, which uses <code>T</code> to separate date &amp;
 time.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">derive first_prql_commit = @2020-01-01T13:19:55-0800
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  TIMESTAMP '2020-01-01T13:19:55-0800' AS first_prql_commit
-</code></pre>
-</div>
-</div>
 <h2 id="intervals"><a class="header" href="#intervals">Intervals</a></h2>
 <p>Intervals are represented by <code>{N}{periods}</code>, such as <code>2years</code> or <code>10minutes</code>,
 without a space.</p>
@@ -225,36 +186,22 @@ without a space.</p>
 <p><a class="admonition-anchor-link" href="#admonition-note-1"></a></p>
 </div>
 <div>
-<p>These aren’t the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
-be difficult to understand, but we could support a simplified form if there’s
-demand for it. We don’t currently support compound expressions, for example
+<p>These aren't the same as ISO8601, because we evaluated <code>P3Y6M4DT12H30M5S</code> to
+be difficult to understand, but we could support a simplified form if there's
+demand for it. We don't currently support compound expressions, for example
 <code>2years10months</code>, but most DBs will allow <code>2years + 10months</code>. Please raise an
 issue if this is inconvenient.</p>
 </div>
 </div>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">from projects
 derive first_check_in = start + 10days
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  projects.*,
-  start + INTERVAL '10' DAY AS first_check_in
-FROM
-  projects
-</code></pre>
-</div>
-</div>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<p>Here’s a fuller list of examples:</p>
+<p>Here's a fuller list of examples:</p>
 <ul>
 <li><code>@20221231</code> is forbidden — it must contain full punctuation (<code>-</code> and <code>:</code>),</li>
 <li><code>@2022-12-31</code> is a date</li>
-<li><code>@2022-12</code> or <code>@2022</code> are forbidden — SQL can’t express a month, only a date</li>
+<li><code>@2022-12</code> or <code>@2022</code> are forbidden — SQL can't express a month, only a date</li>
 <li><code>@16:54:32.123456</code> is a time</li>
 <li><code>@16:54:32</code>, <code>@16:54</code>, <code>@16</code> are all allowed, expressing <code>@16:54:32.000000</code>, <code>@16:54:00.000000</code>, <code>@16:00:00.000000</code> respectively</li>
 <li><code>@2022-12-31T16:54:32.123456</code> is a timestamp without timezone</li>

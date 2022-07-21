@@ -140,10 +140,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
-<pre><code class="language-prql">from employees
+                        <pre><code class="language-prql">from employees
 filter country == &quot;USA&quot;                       # Each line transforms the previous result.
 derive [                                     # This adds columns / variables.
   gross_salary = salary + payroll_tax,
@@ -165,39 +162,6 @@ sort sum_gross_cost
 filter ct &gt; 200
 take 20
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  AVG(salary + payroll_tax),
-  SUM(salary),
-  SUM(salary + payroll_tax),
-  AVG(salary + payroll_tax + benefits_cost),
-  SUM(salary + payroll_tax + benefits_cost) AS sum_gross_cost,
-  COUNT(*) AS ct
-FROM
-  employees
-WHERE
-  country = 'USA'
-  AND salary + payroll_tax + benefits_cost &gt; 0
-GROUP BY
-  title,
-  country
-HAVING
-  COUNT(*) &gt; 200
-ORDER BY
-  sum_gross_cost
-LIMIT
-  20
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group [emp_no] (
   aggregate [
@@ -214,31 +178,6 @@ select salary_k = avg_salary / 1000 # avg_salary should resolve to &quot;AVG(emp
 take 10                             # induces new SELECT
 derive salary = salary_k * 1000     # salary_k should not resolve to &quot;avg_salary / 1000&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    emp_no,
-    AVG(salary) AS emp_salary
-  FROM
-    employees
-  GROUP BY
-    emp_no
-)
-SELECT
-  AVG(table_0.emp_salary) / 1000 AS salary_k,
-  AVG(table_0.emp_salary) / 1000 * 1000 AS salary
-FROM
-  table_0
-  JOIN titles USING(emp_no)
-GROUP BY
-  titles.title
-LIMIT
-  10
-</code></pre>
-</div>
-</div>
 
                     </main>
 

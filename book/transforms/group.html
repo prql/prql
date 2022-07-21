@@ -146,9 +146,6 @@
 </code></pre>
 <p>The partitioning of groups are determined by the <code>key_column</code>s (first argument).</p>
 <p>The most conventional use of <code>group</code> is with <code>aggregate</code>:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group [title, country] (
   aggregate [
@@ -157,80 +154,21 @@ group [title, country] (
   ]
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  title,
-  country,
-  AVG(salary),
-  COUNT(*) AS ct
-FROM
-  employees
-GROUP BY
-  title,
-  country
-</code></pre>
-</div>
-</div>
 <p>In concept, a transform in context of a <code>group</code> does the same transformation to the group as
 it would to the table — for example finding the employee who joined first across
 the whole table:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 sort join_date
 take 1
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  employees.*
-FROM
-  employees
-ORDER BY
-  join_date
-LIMIT
-  1
-</code></pre>
-</div>
-</div>
-<p>To find the employee who joined first in each department, it’s exactly the
+<p>To find the employee who joined first in each department, it's exactly the
 same pipeline, but within a <code>group</code> expression:</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">from employees
 group role (
   sort join_date  # taken from above
   take 1
 )
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">WITH table_0 AS (
-  SELECT
-    employees.*,
-    ROW_NUMBER() OVER (
-      PARTITION BY role
-      ORDER BY
-        join_date
-    ) AS _rn
-  FROM
-    employees
-)
-SELECT
-  table_0.*
-FROM
-  table_0
-WHERE
-  _rn &lt;= 1
-</code></pre>
-</div>
-</div>
 
                     </main>
 

@@ -142,73 +142,18 @@
                     <main>
                         <h1 id="strings"><a class="header" href="#strings">Strings</a></h1>
 <p>Strings in PRQL can use either single or double quotes:</p>
-<div class="comparison">
-<div>
-<h4 id="prql"><a class="header" href="#prql">PRQL</a></h4>
 <pre><code class="language-prql">derive x = &quot;hello world&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql"><a class="header" href="#sql">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  'hello world' AS x
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-1"><a class="header" href="#prql-1">PRQL</a></h4>
 <pre><code class="language-prql">derive x = 'hello world'
 </code></pre>
-</div>
-<div>
-<h4 id="sql-1"><a class="header" href="#sql-1">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  'hello world' AS x
-</code></pre>
-</div>
-</div>
-<p>To quote a string containing quotes, either use the “other” type of quote, or
+<p>To quote a string containing quotes, either use the &quot;other&quot; type of quote, or
 use three-or-more quotes, and close with the same number.</p>
-<div class="comparison">
-<div>
-<h4 id="prql-2"><a class="header" href="#prql-2">PRQL</a></h4>
 <pre><code class="language-prql">derive x = '&quot;hello world&quot;'
 </code></pre>
-</div>
-<div>
-<h4 id="sql-2"><a class="header" href="#sql-2">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  '&quot;hello world&quot;' AS x
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-3"><a class="header" href="#prql-3">PRQL</a></h4>
 <pre><code class="language-prql">derive x = &quot;&quot;&quot;I said &quot;hello world&quot;!&quot;&quot;&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql-3"><a class="header" href="#sql-3">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  'I said &quot;hello world&quot;!' AS x
-</code></pre>
-</div>
-</div>
-<div class="comparison">
-<div>
-<h4 id="prql-4"><a class="header" href="#prql-4">PRQL</a></h4>
 <pre><code class="language-prql">derive x = &quot;&quot;&quot;&quot;&quot;I said &quot;&quot;&quot;hello world&quot;&quot;&quot;!&quot;&quot;&quot;&quot;&quot;
 </code></pre>
-</div>
-<div>
-<h4 id="sql-4"><a class="header" href="#sql-4">SQL</a></h4>
-<pre><code class="language-sql">SELECT
-  'I said &quot;&quot;&quot;hello world&quot;&quot;&quot;!' AS x
-</code></pre>
-</div>
-</div>
 <div id="admonition-note" class="admonition note">
 <div class="admonition-title">
 <p>Note</p>
