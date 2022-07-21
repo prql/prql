@@ -373,10 +373,9 @@ fn ast_of_interpolate_items(pair: Pair<Rule>) -> Result<Vec<InterpolateItem>> {
     pair.into_inner()
         .map(|x| {
             Ok(match x.as_rule() {
-                Rule::interpolate_string_inner => InterpolateItem::String(x.as_str().to_string()),
-                // Rule::interpolate_string_inner | Rule::jinja_string_inner => {
-                //     InterpolateItem::String(x.as_str().to_string())
-                // }
+                Rule::interpolate_string_inner_literal | Rule::interpolate_bracket_literal => {
+                    InterpolateItem::String(x.as_str().to_string())
+                }
                 _ => InterpolateItem::Expr(Box::new(ast_of_parse_pair(x)?.unwrap())),
             })
         })
@@ -608,6 +607,18 @@ Canada
                     Integer: 2
           - String: )
         "###);
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_s_string_brackets() -> Result<()> {
+        // For crystal variables
+        assert_yaml_snapshot!(ast_of_string(r#"s"{{?crystal_var}}""#, Rule::expr_call)?, @r###"
+        ---
+        SString:
+          - String: "{?crystal_var}"
+        "###);
+
         Ok(())
     }
 

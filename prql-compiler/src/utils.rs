@@ -28,7 +28,7 @@ where
             // consumed; is there a way around this? I guess we could show
             // the items after the second, which is kinda weird.
             Some(Position::First(_)) => Err(anyhow!("Expected only one element, but found more.",)),
-            None => Err(anyhow!("Expected only one element, but found none.",)),
+            None => Err(anyhow!("Expected one element, but found none.",)),
             _ => unreachable!(),
         }
     }

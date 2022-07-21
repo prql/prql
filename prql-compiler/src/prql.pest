@@ -114,7 +114,7 @@ opening_quote = _{ PUSH(multi_quote) | PUSH(single_quote) }
 // PEEK refers to the opening quote; either `"` or `'`.
 string_inner = { ( !( PEEK ) ~ ANY )+ }
 // Either > 3 quotes, or just one. Currently both of those can be multiline.
-string = ${ ( opening_quote ) ~ string_inner ~ POP }
+string = ${ opening_quote ~ string_inner ~ POP }
 
 number = ${ operator_add? ~ ( ASCII_DIGIT )+ ~ ("." ~ ( ASCII_DIGIT )+)? }
 
@@ -136,9 +136,16 @@ operator_compare = ${ "==" | "!=" | ">=" | "<=" | ">" | "<" }
 operator_logical = ${ ("and" | "or") ~ &WHITESPACE }
 operator_coalesce = ${ "??" }
 
-s_string = ${ "s" ~ opening_quote ~ ( interpolate_string_inner | ( "{" ~ expr_call ~ "}" ))* ~ POP }
-f_string = ${ "f" ~ opening_quote ~ ( interpolate_string_inner | ( "{" ~ expr_call ~ "}" ))* ~ POP }
-interpolate_string_inner = { ( !( PEEK | "{" ) ~ ANY )+ }
+// If we have lots more string prefixes then we could just have a type
+// `prefixed` string and parse in the parser, but manageable for now.
+s_string = ${ "s" ~ opening_quote ~ interpolate_string_inner ~ POP }
+f_string = ${ "f" ~ opening_quote ~ interpolate_string_inner ~ POP }
+interpolate_string_inner = _{ ( interpolate_string_inner_literal | interpolate_bracket | ( "{" ~ expr_call ~ "}" ))* }
+// We want to strip the outer `{}`, so we make a silent rule and then an inner
+// non-silent rule.
+interpolate_bracket = _{ "{" ~ interpolate_bracket_literal ~ "}" }
+interpolate_bracket_literal = { "{" ~ ( !"}}"  ~ ANY )+ ~ "}" }
+interpolate_string_inner_literal = { ( !( PEEK | "{" ) ~ ANY )+ }
 
 interval_kind = { "microseconds" | "milliseconds" | "seconds" | "minutes" | "hours" | "days" | "weeks" | "months" | "years" }
 interval = ${ number ~ interval_kind }
