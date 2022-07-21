@@ -221,8 +221,8 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
             })
         }
         Rule::ident => {
-            let parsed = ast_of_parse_pairs(pair.into_inner())?;
-            dbg!(parsed).into_only()?.item
+            let parsed = ast_of_parse_pair(dbg!(pair).into_inner().into_only()?)?;
+            parsed
         }
         Rule::ident_unquoted | Rule::jinja => {
             let inner = pair.as_str();
