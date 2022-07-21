@@ -84,6 +84,7 @@ pub trait AstFold {
 pub fn fold_item<T: ?Sized + AstFold>(fold: &mut T, item: Item) -> Result<Item> {
     Ok(match item {
         Item::Ident(ident) => Item::Ident(fold.fold_ident(ident)?),
+        Item::QuotedIdent(ident) => Item::QuotedIdent(fold.fold_ident(ident)?),
         Item::Binary { op, left, right } => Item::Binary {
             op,
             left: Box::new(fold.fold_node(*left)?),

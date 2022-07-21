@@ -32,15 +32,17 @@ pipeline = { WHITESPACE* ~ expr_call ~ (pipe ~ expr_call)* }
 // so we pass anything within them directly through, including otherwise invalid
 // idents, like those with hyphens. Possibly we should consider applying this to
 // expressions rather than just idents — we can adjust as we see more cases.
-ident = @{ !operator ~ !(keyword ~ WHITESPACE) ~ ident_start ~ ("." ~ ident_next)* }
+ident = @{ !operator ~ !(keyword ~ WHITESPACE) ~ (ident_unquoted | ident_quoted) }
+ident_unquoted = @{ ident_start ~ ("." ~ ident_next)* }
 // Either a normal ident (starting with a letter, `$` or `_`), or any string surrounded
 // by backticks.
-ident_start = _{ ((ASCII_ALPHA | "$" | "_") ~ (ASCII_ALPHANUMERIC | "_" )* ) | ident_backticks+ }
+ident_start = _{ ((ASCII_ALPHA | "$" | "_") ~ (ASCII_ALPHANUMERIC | "_" )* ) }
 // We allow `e.*`, but not just `*`, since it might conflict with multiply in
 // some cases.
 ident_next = _{ ident_start | "*" }
-// Anything surrounded by backticks, we pass through.
-ident_backticks = _{ "`" ~ (!NEWLINE ~ !"`" ~ ANY)* ~ "`" }
+// A quoted ident with backticks
+// TODO: This doesn't handle `x`.`y`.`z` — we should probably allow that.
+ident_quoted = { "`" ~ (!NEWLINE ~ !"`" ~ ANY)* ~ "`" }
 // For sorting
 signed_ident = { ( "+" | "-" ) ~ ident }
 keyword = _{ "prql" | "table" | "func" }

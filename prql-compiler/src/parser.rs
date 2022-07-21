@@ -220,13 +220,18 @@ fn ast_of_parse_pair(pair: Pair<Rule>) -> Result<Option<Node>> {
                 pipeline: Box::new(pipeline),
             })
         }
-        Rule::ident | Rule::jinja => {
+        Rule::ident => {
+            let parsed = ast_of_parse_pairs(pair.into_inner())?;
+            dbg!(parsed).into_only()?.item
+        }
+        Rule::ident_unquoted | Rule::jinja => {
             let inner = pair.as_str();
-            let stripped = inner
-                .strip_prefix('`')
-                .and_then(|s| s.strip_suffix('`'))
-                .unwrap_or(inner);
-            Item::Ident(stripped.to_string())
+            Item::Ident(inner.to_string())
+        }
+
+        Rule::ident_quoted => {
+            let inner = pair.as_str();
+            Item::QuotedIdent(inner.to_string())
         }
 
         Rule::number => {
@@ -1459,12 +1464,30 @@ select [
     }
 
     #[test]
+    fn test_parse_tree_backticks() -> Result<()> {
+        let prql = "`my-proj.dataset.table`";
+        assert_debug_snapshot!(parse_tree_of_str(prql, Rule::ident)?, @r###"
+        [
+            Pair {
+                rule: ident,
+                span: Span {
+                    str: "`my-proj.dataset.table`",
+                    start: 0,
+                    end: 23,
+                },
+                inner: [],
+            },
+        ]
+        "###);
+
+        Ok(())
+    }
+    #[test]
     fn test_parse_backticks() -> Result<()> {
         let prql = "
 from `a`
 aggregate [max c]
 join `my-proj.dataset.table`
-join `my-proj`.`dataset`.`table`
 ";
         assert_yaml_snapshot!(parse(prql)?, @r###"
         ---
@@ -1476,7 +1499,7 @@ join `my-proj`.`dataset`.`table`
                 - FuncCall:
                     name: from
                     args:
-                      - Ident: a
+                      - Ident: "`a`"
                     named_args: {}
                 - FuncCall:
                     name: aggregate
@@ -1491,12 +1514,7 @@ join `my-proj`.`dataset`.`table`
                 - FuncCall:
                     name: join
                     args:
-                      - Ident: my-proj.dataset.table
-                    named_args: {}
-                - FuncCall:
-                    name: join
-                    args:
-                      - Ident: "my-proj`.`dataset`.`table"
+                      - Ident: "`my-proj.dataset.table`"
                     named_args: {}
         "###);
 

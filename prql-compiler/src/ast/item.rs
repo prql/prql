@@ -11,6 +11,8 @@ use super::*;
 #[derive(Debug, EnumAsInner, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Item {
     Ident(Ident),
+    // Another option would be to have an Ident with a quoted field...
+    QuotedIdent(Ident),
     Literal(Literal),
     Assign(NamedExpr),
     NamedArg(NamedExpr),
@@ -207,6 +209,9 @@ impl Display for Item {
         match self {
             Item::Ident(s) => {
                 f.write_str(s)?;
+            }
+            Item::QuotedIdent(s) => {
+                write!(f, "`{}`", s)?;
             }
             Item::Assign(ne) => {
                 write!(f, "{} = {}", ne.name, ne.expr.item)?;

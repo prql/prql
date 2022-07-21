@@ -1428,7 +1428,7 @@ take 20
         assert_display_snapshot!((resolve_and_translate(query)?), @r###"
         SELECT
           "FirstName",
-          "last name"
+          "`last name`"
         FROM
           "Employees"
         LIMIT
@@ -1448,7 +1448,7 @@ take 20
         assert_display_snapshot!((resolve_and_translate(query)?), @r###"
         SELECT
           TOP (3) "FirstName",
-          "last name"
+          "`last name`"
         FROM
           "Employees"
         "###);
@@ -1466,7 +1466,7 @@ take 20
         assert_display_snapshot!((resolve_and_translate(query)?), @r###"
         SELECT
           `FirstName`,
-          `last name`
+          ```last name```
         FROM
           `Employees`
         LIMIT
@@ -1488,11 +1488,11 @@ take 20
 
         assert_display_snapshot!((resolve_and_translate(query)?), @r###"
         SELECT
-          "anim""ls".*,
-          "BeeName" AS "čebela",
-          "bear's_name" AS medved
+          "`anim""ls`".*,
+          "BeeName" AS "`čebela`",
+          "`bear's_name`" AS medved
         FROM
-          "anim""ls"
+          "`anim""ls`"
         "###);
 
         // MySQL
@@ -1507,11 +1507,11 @@ take 20
 
         assert_display_snapshot!((resolve_and_translate(query)?), @r###"
         SELECT
-          `anim"ls`.*,
-          `BeeName` AS `čebela`,
-          `bear's_name` AS medved
+          ```anim"ls```.*,
+          `BeeName` AS ```čebela```,
+          ```bear's_name``` AS medved
         FROM
-          `anim"ls`
+          ```anim"ls```
         "###);
 
         Ok(())
