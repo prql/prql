@@ -38,6 +38,8 @@
   - [dbt](./integrations/dbt.md)
   - [Jupyter](./integrations/jupyter.md)
   - [Prefect](./integrations/prefect.md)
+  - [Python](./integrations/python.md)
+  - [Rust](./integrations/rust.md)
   - [VSCode]()
   - [Rill]()
 
